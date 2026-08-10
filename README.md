@@ -6,6 +6,8 @@
 
 Merge restaurant **Offline (Dine-in)** and **Online** menu CSVs in seconds while preserving online availability and replacing prices with offline values.
 
+https://atomxharshyt.github.io/dinetoonline/
+
 No installation. No server. No data upload. Everything runs **100% inside your browser**.
 
 ---
