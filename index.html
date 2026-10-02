@@ -1,1009 +1,518 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menu Price Merger</title>
-  <style>
-    :root {
-      --bg-primary: #0a0e17;
-      --bg-secondary: #0f1420;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --grad-1: #6366f1;
-      --grad-2: #8b5cf6;
-      --grad-3: #ec4899;
-      --grad-success1: #10b981;
-      --grad-success2: #059669;
-      --grad-danger1: #ef4444;
-      --grad-danger2: #dc2626;
-      --grad-warn1: #f59e0b;
-      --grad-warn2: #d97706;
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 8px;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family:
-        "Segoe UI",
-        system-ui,
-        -apple-system,
-        sans-serif;
-      background: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.15), transparent 40%), radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.12), transparent 40%), var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 36px;
-      padding: 20px 0;
-    }
-
-    header h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--grad-1), var(--grad-2), var(--grad-3));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 6px;
-      letter-spacing: -0.5px;
-    }
-
-    header p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-
-    .glass-card {
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-    }
-
-    .info-banner {
-      padding: 16px 22px;
-      margin-bottom: 24px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      font-size: 0.88rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .info-banner .ic {
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .info-banner b {
-      color: var(--text-primary);
-    }
-
-    .upload-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 28px;
-    }
-
-    @media (max-width: 768px) {
-      .upload-grid {
-        grid-template-columns: 1fr;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dine-in Menu Processor</title>
+    <style>
+      :root {
+        --bg: #070b14;
+        --panel: #0d1422;
+        --panel2: #111a2b;
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --dim: #64748b;
+        --p1: #6366f1;
+        --p2: #8b5cf6;
+        --ok: #10b981;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+        --r: 18px;
       }
-    }
-
-    .upload-card {
-      padding: 32px 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .upload-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .upload-card:hover::before {
-      opacity: 1;
-    }
-
-    .upload-card:hover {
-      border-color: rgba(99, 102, 241, 0.5);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
-    }
-
-    .upload-card.dragover {
-      border-color: var(--grad-1);
-      background: rgba(99, 102, 241, 0.1);
-      transform: scale(1.02);
-    }
-
-    .upload-card.loaded {
-      border-color: rgba(16, 185, 129, 0.5);
-    }
-
-    .upload-icon {
-      font-size: 2.8rem;
-      margin-bottom: 14px;
-      display: block;
-      position: relative;
-      z-index: 1;
-    }
-
-    .upload-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .upload-sub {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .upload-filename {
-      margin-top: 14px;
-      padding: 8px 16px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      color: #34d399;
-      display: inline-block;
-      word-break: break-all;
-      position: relative;
-      z-index: 1;
-    }
-
-    .upload-card input[type="file"] {
-      display: none;
-    }
-
-    .config-section {
-      padding: 20px 24px;
-      margin-bottom: 24px;
-    }
-
-    .config-row {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .config-text {
-      flex: 1;
-      min-width: 260px;
-    }
-
-    .config-label {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .config-hint {
-      font-size: 0.82rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .config-hint code {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #a5b4fc;
-      font-family: monospace;
-    }
-
-    #suffixCodeInput {
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      min-width: 200px;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    #suffixCodeInput:focus {
-      border-color: var(--grad-1);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    #suffixCodeInput::placeholder {
-      color: var(--text-muted);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    @media (max-width: 1100px) {
-      .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
+      * {
+        box-sizing: border-box;
       }
-    }
-
-    @media (max-width: 600px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family:
+          Inter,
+          Segoe UI,
+          system-ui,
+          sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at 10% 10%,
+            rgba(99, 102, 241, 0.18),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at 90% 85%,
+            rgba(236, 72, 153, 0.13),
+            transparent 34%
+          ),
+          var(--bg);
       }
-    }
-
-    .stat-card {
-      padding: 20px;
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .stat-value {
-      font-size: 1.9rem;
-      font-weight: 800;
-      margin-bottom: 4px;
-      background: linear-gradient(135deg, var(--grad-1), var(--grad-3));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .stat-label {
-      color: var(--text-secondary);
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 28px;
-    }
-
-    .btn {
-      padding: 14px 26px;
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      color: #fff;
-      letter-spacing: 0.2px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      filter: grayscale(0.5);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--grad-1), var(--grad-2));
-    }
-
-    .btn-primary:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--grad-success1), var(--grad-success2));
-    }
-
-    .btn-success:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, var(--grad-danger1), var(--grad-danger2));
-    }
-
-    .btn-danger:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-    }
-
-    .btn-warn {
-      background: linear-gradient(135deg, var(--grad-warn1), var(--grad-warn2));
-    }
-
-    .btn-warn:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--glass-border);
-    }
-
-    .btn-secondary:not(:disabled):hover {
-      background: rgba(255, 255, 255, 0.14);
-      transform: translateY(-2px);
-    }
-
-    .progress-section {
-      padding: 24px;
-      margin-bottom: 28px;
-      display: none;
-    }
-
-    .progress-section.active {
-      display: block;
-    }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    #progressStatus {
-      color: var(--text-primary);
-      font-weight: 600;
-    }
-
-    .progress-track {
-      height: 12px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 20px;
-      background: linear-gradient(90deg, var(--grad-1), var(--grad-2), var(--grad-3));
-      background-size: 200% 100%;
-      animation: shimmer 2s linear infinite;
-      transition: width 0.4s ease;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: 0% 50%;
+      body {
+        padding: 28px;
       }
-
-      100% {
-        background-position: 200% 50%;
+      .wrap {
+        max-width: 1080px;
+        margin: auto;
       }
-    }
-
-    .result-section {
-      padding: 28px;
-      margin-bottom: 28px;
-      display: none;
-    }
-
-    .result-section.active {
-      display: block;
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .result-header .check-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--grad-success1), var(--grad-success2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-    }
-
-    .result-header h2 {
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    .result-summary {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 700px) {
-      .result-summary {
-        grid-template-columns: repeat(2, 1fr);
+      .top {
+        text-align: center;
+        padding: 12px 0 28px;
       }
-    }
-
-    .result-item {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      text-align: center;
-    }
-
-    .result-item .val {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
-
-    .result-item .lbl {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .section-title {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 14px;
-      margin-top: 24px;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title:first-of-type {
-      margin-top: 0;
-    }
-
-    .table-wrap {
-      max-height: 520px;
-      overflow-y: auto;
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
-
-    thead th {
-      position: sticky;
-      top: 0;
-      background: rgba(15, 20, 32, 0.95);
-      padding: 12px 16px;
-      text-align: left;
-      color: var(--text-secondary);
-      font-weight: 600;
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    tbody td {
-      padding: 10px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-    }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 30px;
-      color: var(--text-muted);
-    }
-
-    .mark-yes-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .mark-yes-label input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--grad-success1);
-      cursor: pointer;
-    }
-
-    #toastContainer {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .toast {
-      min-width: 280px;
-      max-width: 360px;
-      padding: 16px 20px;
-      border-radius: var(--radius-md);
-      background: rgba(20, 25, 38, 0.95);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      animation: slideIn 0.35s ease forwards;
-      font-size: 0.9rem;
-    }
-
-    .toast.hide {
-      animation: slideOut 0.35s ease forwards;
-    }
-
-    .toast .icon {
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-
-    .toast.success {
-      border-left: 4px solid #10b981;
-    }
-
-    .toast.error {
-      border-left: 4px solid #ef4444;
-    }
-
-    .toast.info {
-      border-left: 4px solid #6366f1;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(120%);
-        opacity: 0;
+      .logo {
+        font-size: 42px;
       }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
+      .top h1 {
+        margin: 4px 0 5px;
+        font-size: 34px;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, #818cf8, #a78bfa, #f472b6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
       }
-    }
-
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
+      .top p {
+        margin: 0;
+        color: var(--muted);
       }
-
-      to {
-        transform: translateX(120%);
-        opacity: 0;
+      .card {
+        background: rgba(13, 20, 34, 0.82);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(18px);
       }
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px 0 10px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    footer strong {
-      color: var(--text-secondary);
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-      animation: pageFadeIn 0.35s ease;
-    }
-
-    @keyframes pageFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
+      .notice {
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
       }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      .notice b {
+        color: var(--text);
       }
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin: 44px 0 28px;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    .divider span {
-      padding: 0 16px;
-    }
-
-    #nonFoodKeywords {
-      width: 100%;
-      min-height: 160px;
-      max-height: 260px;
-      padding: 14px 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      font-size: 0.85rem;
-      font-family: "Consolas", monospace;
-      line-height: 1.6;
-      resize: vertical;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    #nonFoodKeywords:focus {
-      border-color: var(--grad-1);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .picker-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    .picker-row:last-child {
-      border-bottom: none;
-    }
-
-    .picker-row label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .picker-sub {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 400;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .picker-row select {
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      min-width: 240px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .picker-row select:focus {
-      border-color: var(--grad-1);
-    }
-  </style>
-</head>
-
-<body>
-  <div id="toastContainer"></div>
-
-  <div class="container">
-    <header>
-      <h1>Menu Price Merger</h1>
-      <p>Offline → Online Price Synchronizer</p>
-    </header>
-
-    <div id="page-merge" class="page active">
-      <div class="glass-card info-banner">
-        <span class="ic">ℹ️</span>
-        <div><b>Merge logic:</b> Final file = every item from Offline Menu + Online Menu combined (matched by exact Item
-          Name). <b>Price</b> always comes from the Offline (Dine-in) Menu. <b>Available</b> = "Yes" only if the item is
-          marked Yes in the Online Menu — items only found offline (not sold online) are marked "No". Output columns
-          follow the Online Menu structure (includes Area Display Name).</div>
+      .upload {
+        padding: 28px;
+        text-align: center;
+        border: 1px dashed rgba(129, 140, 248, 0.45);
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .upload:hover,
+      .upload.drag {
+        background: rgba(99, 102, 241, 0.08);
+        border-color: #818cf8;
+        transform: translateY(-1px);
+      }
+      .upload-icon {
+        font-size: 42px;
+      }
+      .upload h2 {
+        margin: 10px 0 5px;
+        font-size: 18px;
+      }
+      .upload p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .filename {
+        display: none;
+        margin: 14px auto 0;
+        max-width: 90%;
+        padding: 9px 12px;
+        border-radius: 9px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.28);
+        color: #6ee7b7;
+        word-break: break-all;
+        font-size: 12px;
+      }
+      .upload.loaded {
+        border-color: rgba(16, 185, 129, 0.55);
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .config {
+        padding: 18px;
+        margin-bottom: 18px;
+      }
+      .label {
+        font-weight: 750;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .keywords {
+        width: 100%;
+        height: 190px;
+        resize: vertical;
+        margin-top: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 12px;
+        font:
+          12px/1.55 Consolas,
+          monospace;
+        outline: none;
+      }
+      .keywords:focus {
+        border-color: #818cf8;
+      }
+      .options {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .option {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        color: #cbd5e1;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .option input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--p1);
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 18px 0;
+      }
+      .btn {
+        border: 0;
+        border-radius: 11px;
+        padding: 12px 18px;
+        color: white;
+        font-weight: 750;
+        cursor: pointer;
+        transition: 0.18s;
+        font-size: 13px;
+      }
+      .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        filter: brightness(1.07);
+      }
+      .btn:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+      }
+      .primary {
+        background: linear-gradient(135deg, var(--p1), var(--p2));
+      }
+      .success {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+      .secondary {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid var(--border);
+      }
+      .progress {
+        display: none;
+        padding: 18px;
+        margin-bottom: 18px;
+      }
+      .progress.show {
+        display: block;
+      }
+      .progress-line {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 9px;
+      }
+      .progress-line b {
+        color: var(--text);
+      }
+      .track {
+        height: 9px;
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+        transition: 0.25s;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .stat {
+        padding: 16px;
+        text-align: center;
+      }
+      .stat .n {
+        font-size: 25px;
+        font-weight: 850;
+      }
+      .stat .l {
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-top: 3px;
+      }
+      .result {
+        display: none;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      .result.show {
+        display: block;
+      }
+      .result-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+      .check {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #10b981, #059669);
+        font-size: 20px;
+      }
+      .result h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .result small {
+        color: var(--muted);
+      }
+      .table-wrap {
+        max-height: 470px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .review-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .review-table th {
+        position: sticky;
+        top: 0;
+        background: #111827;
+        color: var(--muted);
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        z-index: 1;
+      }
+      .review-table td {
+        padding: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        vertical-align: top;
+      }
+      .review-table tr:last-child td {
+        border-bottom: 0;
+      }
+      .reason {
+        color: #fbbf24;
+        font-size: 11px;
+      }
+      .review-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .select {
+        background: #111827;
+        color: #e2e8f0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px;
+      }
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 30px;
+      }
+      .toast {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        z-index: 50;
+        min-width: 260px;
+        max-width: 380px;
+        padding: 13px 16px;
+        border-radius: 11px;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid var(--border);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+        font-size: 13px;
+      }
+      .toast.ok {
+        border-left: 4px solid var(--ok);
+      }
+      .toast.err {
+        border-left: 4px solid var(--danger);
+      }
+      footer {
+        text-align: center;
+        color: var(--dim);
+        font-size: 12px;
+        padding: 18px;
+      }
+      @media (max-width: 700px) {
+        body {
+          padding: 15px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .top h1 {
+          font-size: 28px;
+        }
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+        .actions .btn {
+          flex: 1 1 180px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast"></div>
+    <div class="wrap">
+      <header class="top">
+        <div class="logo">🍽️</div>
+        <h1>Dine-in Menu Processor</h1>
+        <p>
+          Process your Dine-in CSV locally, review every automatic “No”, then
+          download the Petpooja-ready file.
+        </p>
+      </header>
+      <div class="card notice">
+        <b>Same processor logic as the extension.</b> The web version uses the
+        current extension engine: exact <b>Price</b> column selection,
+        zero-price rules, non-food detection, dietary filters, duplicate-header
+        protection, and automatic <b>Area Display Name</b> handling. The old
+        ₹10/₹15 price rule is completely removed.
       </div>
-
-      <!-- ============ UPLOAD SECTION ============ -->
-      <div class="upload-grid">
-        <div class="glass-card upload-card" id="offlineCard">
-          <input type="file" id="offlineInput" accept=".csv" />
-          <span class="upload-icon">🗂️</span>
-          <div class="upload-title">Offline Menu CSV</div>
-          <div class="upload-sub">Dine-in prices • Drag &amp; drop or click to upload</div>
-          <div class="upload-filename" id="offlineFilename" style="display: none"></div>
-        </div>
-
-        <div class="glass-card upload-card" id="onlineCard">
-          <input type="file" id="onlineInput" accept=".csv" />
-          <span class="upload-icon">🌐</span>
-          <div class="upload-title">Online Menu CSV</div>
-          <div class="upload-sub">Availability source • Drag &amp; drop or click to upload</div>
-          <div class="upload-filename" id="onlineFilename" style="display: none"></div>
-        </div>
-      </div>
-
-      <div class="controls" style="margin-bottom: 28px">
-        <button class="btn btn-secondary" id="openDineInBtn">🍽️ Don't have an Online Menu? Open Dine-in Only Processor
-          →</button>
-        <button class="btn btn-secondary" id="openAreaSheetBtn">📍 Item Area-wise Price Sheet →</button>
-      </div>
-
-      <!-- ============ SUFFIX CODE CONFIG ============ -->
-      <div class="glass-card config-section">
-        <div class="config-row">
-          <div class="config-text">
-            <div class="config-label">🏷️ Online Item Name Suffix Code (optional)</div>
-            <div class="config-hint">
-              If Online Menu item names end with a short code like
-              <code>[O]</code> or <code>[online]</code> that the Offline Menu doesn't have, enter it here exactly. It
-              will be stripped from the end of each Online item name before matching.
-            </div>
+      <div class="grid">
+        <section class="card upload" id="upload">
+          <input id="file" type="file" accept=".csv" />
+          <div class="upload-icon">📄</div>
+          <h2>Dine-in Menu CSV</h2>
+          <p>Click or drag & drop your CSV here</p>
+          <div id="filename" class="filename"></div>
+        </section>
+        <section class="card config" style="padding: 22px">
+          <div class="label">🥗 Dietary Options</div>
+          <div class="hint">
+            Uses the CSV Dietary tag. Normal Veg items are not affected.
           </div>
-          <input type="text" id="suffixCodeInput" placeholder="e.g. [O]" spellcheck="false" />
-        </div>
-      </div>
-
-      <!-- ============ STATS SECTION ============ -->
-      <div class="stats-grid">
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statOffline">0</div>
-          <div class="stat-label">Offline Items</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statOnline">0</div>
-          <div class="stat-label">Online Items</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statMatched">0</div>
-          <div class="stat-label">Matched (Both Files)</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statOfflineOnly">0</div>
-          <div class="stat-label">Offline-Only Added</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statFinalTotal">0</div>
-          <div class="stat-label">Final Total Rows</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statSuffixStripped">0</div>
-          <div class="stat-label">Suffix Codes Stripped</div>
-        </div>
-      </div>
-
-      <!-- ============ CONTROLS ============ -->
-      <div class="controls">
-        <button class="btn btn-primary" id="mergeBtn" disabled>⚡ Merge Menus</button>
-        <button class="btn btn-secondary" id="resetBtn">↺ Reset</button>
-        <button class="btn btn-success" id="downloadFinalBtn" disabled>⬇ Download Final CSV</button>
-        <button class="btn btn-warn" id="downloadOfflineOnlyBtn" disabled>⬇ Download Offline-Only Added</button>
-        <button class="btn btn-danger" id="downloadNotFoundBtn" disabled>⬇ Download Online w/o Offline Price</button>
-      </div>
-
-      <!-- ============ PROGRESS ============ -->
-      <div class="glass-card progress-section" id="progressSection">
-        <div class="progress-label">
-          <span>Processing</span>
-          <span id="progressStatus">Preparing...</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
-
-      <!-- ============ RESULT SECTION ============ -->
-      <div class="glass-card result-section" id="resultSection">
-        <div class="result-header">
-          <div class="check-icon">✓</div>
-          <h2>Merge Completed</h2>
-        </div>
-        <div class="result-summary">
-          <div class="result-item">
-            <div class="val" id="resMatched">0</div>
-            <div class="lbl">Matched Items</div>
+          <div class="options">
+            <label class="option"
+              ><input id="nonveg" type="checkbox" /> Mark Non-Veg as No</label
+            ><label class="option"
+              ><input id="egg" type="checkbox" /> Mark Egg as No</label
+            >
           </div>
-          <div class="result-item">
-            <div class="val" id="resOfflineOnly">0</div>
-            <div class="lbl">Offline-Only Added</div>
+          <div class="label" style="margin-top: 22px">
+            🚫 Non-Food / Non-Eatable Keywords
           </div>
-          <div class="result-item">
-            <div class="val" id="resNotFound">0</div>
-            <div class="lbl">Online w/o Offline Price</div>
+          <div class="hint">
+            One term per line. Whole-word matching. You can edit this list
+            before processing.
           </div>
-          <div class="result-item">
-            <div class="val" id="resTime">0ms</div>
-            <div class="lbl">Processing Time</div>
+          <textarea
+            id="keywords"
+            class="keywords"
+            spellcheck="false"
+          ></textarea>
+        </section>
+      </div>
+      <div class="stats">
+        <div class="card stat">
+          <div id="total" class="n">0</div>
+          <div class="l">Total Items</div>
+        </div>
+        <div class="card stat">
+          <div id="marked" class="n">0</div>
+          <div class="l">Marked No</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="process" class="btn primary" disabled>
+          ⚡ Process Menu</button
+        ><button id="reset" class="btn secondary">↺ Reset</button
+        ><button id="download" class="btn success" disabled>
+          ⬇ Download Processed CSV
+        </button>
+      </div>
+      <div id="progress" class="card progress">
+        <div class="progress-line">
+          <span>Processing</span><b id="progressText">Preparing...</b>
+        </div>
+        <div class="track"><div id="fill" class="fill"></div></div>
+      </div>
+      <section id="result" class="card result">
+        <div class="result-head">
+          <div class="check">✓</div>
+          <div>
+            <h2>Menu Processed</h2>
+            <small
+              >Review the rows that were automatically marked Available =
+              No.</small
+            >
           </div>
         </div>
-
-        <div class="section-title">🆕 Offline-Only Items Added (Available = No)</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Item Name</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody id="offlineOnlyTableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="section-title">⚠️ Online Items With No Offline Price Match</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Item Name</th>
-                <th>Kept Online Price</th>
-              </tr>
-            </thead>
-            <tbody id="notFoundTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <!-- /#page-merge -->
-
-    <div id="page-dinein" class="page">
-      <div class="controls" style="margin-bottom: 24px">
-        <button class="btn btn-secondary" id="backToMergeBtn">← Back to Merge Tool</button>
-      </div>
-
-      <!-- ============ DINE-IN ONLY PROCESSOR SECTION ============ -->
-      <div class="glass-card info-banner">
-        <span class="ic">🍽️</span>
-        <div><b>Dine-in Only Processor</b> — use this when you don't have an Online Menu file at all, just the Offline
-          (Dine-in) Menu. It adds an <b>Area Display Name</b> column right after Online Display Name (left blank), and
-          automatically marks known <b>non-food items</b> (tissues, cutlery, packaging charges, alcohol,
-          decoration/event charges, etc.) as <b>Available = No</b>. Everything else keeps its original Available value.
-          This works completely independently of the merge tool above.</div>
-      </div>
-
-      <div class="glass-card upload-card" id="dineInCard" style="max-width: 500px; margin: 0 auto 24px">
-        <input type="file" id="dineInInput" accept=".csv" />
-        <span class="upload-icon">🍽️</span>
-        <div class="upload-title">Dine-in Menu CSV</div>
-        <div class="upload-sub">Drag &amp; drop or click to upload</div>
-        <div class="upload-filename" id="dineInFilename" style="display: none"></div>
-      </div>
-
-      <div class="glass-card config-section">
-        <div class="config-label" style="margin-bottom: 10px">🚫 Non-Food / Non-Eatable Item Keywords (editable)</div>
-        <div class="config-hint" style="margin-bottom: 12px">One term per line. Matching is <b>whole-word</b> — it
-          catches items like "Extra Tissue Paper" or "Packing Charge - Small" too. Add, remove, or edit lines to fit
-          your menu. Some short/common words (e.g. "Bowl", "Cup", "Glass", "Straw") can occasionally match a real dish
-          name (like "Rice Bowl") — remove them from the list below if that applies to your menu.</div>
-        <textarea id="nonFoodKeywords" spellcheck="false"></textarea>
-      </div>
-
-      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px">
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statDineInTotal">0</div>
-          <div class="stat-label">Total Items</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statDineInMarked">0</div>
-          <div class="stat-label">Marked Non-Food (No)</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statDineInKeywords">0</div>
-          <div class="stat-label">Keywords Loaded</div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button class="btn btn-primary" id="dineInProcessBtn" disabled>⚡ Process Dine-in Menu</button>
-        <button class="btn btn-secondary" id="dineInResetBtn">↺ Reset</button>
-        <button class="btn btn-success" id="dineInDownloadBtn" disabled>⬇ Download Processed CSV</button>
-      </div>
-
-      <div class="glass-card progress-section" id="dineInProgressSection">
-        <div class="progress-label">
-          <span>Processing</span>
-          <span id="dineInProgressStatus">Preparing...</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="dineInProgressFill"></div>
-        </div>
-      </div>
-
-      <div class="glass-card result-section" id="dineInResultSection">
-        <div class="result-header">
-          <div class="check-icon">✓</div>
-          <h2>Dine-in Menu Processed</h2>
-        </div>
-        <div class="result-summary" style="grid-template-columns: repeat(3, 1fr)">
-          <div class="result-item">
-            <div class="val" id="dineInResTotal">0</div>
-            <div class="lbl">Total Items</div>
+        <div class="review-actions">
+          <div class="hint" id="reviewCount">0 items marked</div>
+          <div style="display: flex; gap: 8px">
+            <select id="reasonFilter" class="select">
+              <option value="all">All Reasons</option>
+              <option value="nonfood">Non-Food</option>
+              <option value="zero">Zero Price</option>
+              <option value="zero-variation">
+                Zero Price (All Variations)
+              </option>
+              <option value="dietary">Dietary</option></select
+            ><button
+              id="selectAll"
+              class="btn secondary"
+              style="padding: 8px 11px"
+            >
+              ☑ Select All
+            </button>
           </div>
-          <div class="result-item">
-            <div class="val" id="dineInResMarked">0</div>
-            <div class="lbl">Marked No</div>
-          </div>
-          <div class="result-item">
-            <div class="val" id="dineInResTime">0ms</div>
-            <div class="lbl">Processing Time</div>
-          </div>
-        </div>
-        <div class="section-title">🚫 Items Marked Available = No</div>
-        <div style="margin-bottom: 10px">
-          <label class="mark-yes-label"><input type="checkbox" id="selectAllYesCheckbox" /> Mark All as Yes</label>
         </div>
         <div class="table-wrap">
-          <table>
+          <table class="review-table">
             <thead>
               <tr>
                 <th>#</th>
@@ -1012,1862 +521,1092 @@
                 <th>Override</th>
               </tr>
             </thead>
-            <tbody id="dineInMarkedTableBody"></tbody>
+            <tbody id="reviewBody"></tbody>
           </table>
         </div>
-      </div>
+      </section>
+      <footer>
+        Runs locally in your browser. Your CSV is not uploaded anywhere.
+      </footer>
     </div>
-    <!-- /#page-dinein -->
+    <script>
+      (() => {
+        const DEFAULT_NONFOOD_KEYWORDS = [
+          "Tissue",
+          "Tissue Paper",
+          "Paper Napkin",
+          "Napkin",
+          "Wet Wipe",
+          "Wet Wipes",
+          "Wipe",
+          "Toothpick",
+          "Straw",
+          "Paper Straw",
+          "Plastic Straw",
+          "Spoon",
+          "Plastic Spoon",
+          "Wooden Spoon",
+          "Fork",
+          "Knife",
+          "Chopsticks",
+          "Plate",
+          "Disposable Plate",
+          "Bowl",
+          "Disposable Bowl",
+          "Glass",
+          "Disposable Glass",
+          "Cup",
+          "Disposable Cup",
+          "Cutlery",
+          "Disposable Cutlery",
+          "Tray",
+          "Carry Bag",
+          "Paper Bag",
+          "Plastic Bag",
+          "Shopping Bag",
+          "Food Container",
+          "Container",
+          "Disposable Container",
+          "Packaging",
+          "Packaging Charge",
+          "Packing",
+          "Packing Charge",
+          "Parcel Charge",
+          "Parcel Packing",
+          "Takeaway Box",
+          "Pizza Box",
+          "Cake Box",
+          "Burger Box",
+          "Bottle Deposit",
+          "Jar Deposit",
+          "Deposit",
+          "Security Deposit",
+          "Container Deposit",
+          "Delivery Charge",
+          "Packing Fee",
+          "Packaging Fee",
+          "Handling Charge",
+          "Convenience Fee",
+          "Service Charge",
+          "Cover Charge",
+          "Entry Fee",
+          "Reservation Fee",
+          "Table Booking",
+          "Table Reservation",
+          "Birthday Decoration",
+          "Anniversary Decoration",
+          "Decoration Charge",
+          "Balloon Decoration",
+          "Flower Decoration",
+          "Candle Light Dinner",
+          "Live Music Charge",
+          "DJ Charge",
+          "Banquet Charge",
+          "Hall Rent",
+          "Room Charge",
+          "Extra Plate",
+          "Extra Bowl",
+          "Extra Spoon",
+          "Extra Fork",
+          "Extra Knife",
+          "Extra Cup",
+          "Extra Glass",
+          "Ice Charge",
+          "Cooling Charge",
+          "Empty Glass",
+          "Empty Bottle",
+          "Match Box",
+          "Lighter",
+          "Gift Voucher",
+          "Gift Card",
+          "Membership Card",
+          "Loyalty Card",
+          "Recharge Coupon",
+          "Coupon Redemption",
+          "Wallet Redemption",
+          "Token",
+          "Discount",
+          "Discount Amount",
+          "Flat Discount",
+          "Percentage Discount",
+          "Round Off",
+          "Roundoff",
+          "Adjustment",
+          "Cash Adjustment",
+          "Credit Adjustment",
+          "Debit Adjustment",
+          "Advance",
+          "Advance Payment",
+          "Balance",
+          "Refund",
+          "Refund Amount",
+          "Credit Note",
+          "Complimentary",
+          "Comp",
+          "Staff Meal",
+          "Employee Meal",
+          "Staff Discount",
+          "Dummy Item",
+          "Test Item",
+          "Sample Item",
+          "Cancel Item",
+          "Deleted Item",
+          "POS Adjustment",
+          "Manual Adjustment",
+          "Raw Rice",
+          "Rice Bag",
+          "Flour",
+          "Maida",
+          "Atta",
+          "Cooking Oil",
+          "Refined Oil",
+          "Gas Cylinder",
+          "LPG Cylinder",
+          "Detergent",
+          "Cleaning Powder",
+          "Dishwash Liquid",
+          "Sanitizer",
+          "Hand Sanitizer",
+          "Gloves",
+          "Apron",
+          "Kitchen Cloth",
+          "Garbage Bag",
+          "Cleaning Charge",
+          "Maintenance Charge",
+          "Service Fee",
+          "Cigarette",
+          "Cigarettes",
+          "Cigar",
+          "Beedi",
+          "Bidi",
+          "Tobacco",
+          "Chewing Tobacco",
+          "Gutkha",
+          "Pan Masala",
+          "Hookah",
+          "Hukka",
+          "Shisha",
+          "Vape",
+          "E-Cigarette",
+          "Nicotine",
+          "Beer",
+          "Draft Beer",
+          "Draught Beer",
+          "Craft Beer",
+          "Lager",
+          "Ale",
+          "Stout",
+          "IPA",
+          "Pilsner",
+          "Wheat Beer",
+          "Strong Beer",
+          "Light Beer",
+          "Pint",
+          "Mug Beer",
+          "Pitcher Beer",
+          "Tower Beer",
+          "Wine",
+          "Red Wine",
+          "White Wine",
+          "Rose Wine",
+          "Rosé",
+          "Sparkling Wine",
+          "Champagne",
+          "Prosecco",
+          "Sangria",
+          "Whisky",
+          "Whiskey",
+          "Scotch",
+          "Single Malt",
+          "Double Malt",
+          "Blended Whisky",
+          "Bourbon",
+          "Rye Whiskey",
+          "Irish Whiskey",
+          "Japanese Whisky",
+          "Rum",
+          "Dark Rum",
+          "White Rum",
+          "Gold Rum",
+          "Spiced Rum",
+          "Old Monk",
+          "Bacardi",
+          "Vodka",
+          "Flavoured Vodka",
+          "Absolut",
+          "Smirnoff",
+          "Grey Goose",
+          "Gin",
+          "London Dry Gin",
+          "Bombay Gin",
+          "Tequila",
+          "Silver Tequila",
+          "Gold Tequila",
+          "Reposado",
+          "Anejo",
+          "Añejo",
+          "Brandy",
+          "Cognac",
+          "Liqueur",
+          "Baileys",
+          "Kahlua",
+          "Kahlúa",
+          "Malibu",
+          "Triple Sec",
+          "Cointreau",
+          "Amaretto",
+          "Sambuca",
+          "Jagermeister",
+          "Jägermeister",
+          "Mead",
+          "Cider",
+          "Hard Cider",
+          "Sake",
+          "Soju",
+          "Cocktail",
+          "Alcoholic Cocktail",
+          "Margarita",
+          "Martini",
+          "Cosmopolitan",
+          "Bloody Mary",
+          "Long Island Iced Tea",
+          "Old Fashioned",
+          "Manhattan",
+          "Negroni",
+          "Daiquiri",
+          "Pina Colada",
+          "Piña Colada",
+          "Whiskey Sour",
+          "Gin and Tonic",
+          "Gin & Tonic",
+          "Rum and Coke",
+          "Rum & Coke",
+          "Screwdriver",
+          "Peg",
+          "Small Peg",
+          "Large Peg",
+          "Quarter",
+          "Half Bottle",
+          "Full Bottle",
+          "Bottle",
+          "Mini Bottle",
+          "Shot",
+          "Shots",
+          "Shooter",
+          "Alcohol",
+          "Liquor",
+          "Spirit",
+          "Spirits",
+          "Hard Liquor",
+          "Hard Drink",
+          "IMFL",
+          "Imported Liquor",
+          "Indian Made Foreign Liquor",
+          "Birthday Cake Topper",
+          "Cake Topper",
+          "Birthday Candle",
+          "Number Candle",
+          "Sparkle Candle",
+          "Sparkler",
+          "Party Popper",
+          "Birthday Cap",
+          "Birthday Hat",
+          "Party Hat",
+          "Birthday Banner",
+          "Happy Birthday Banner",
+          "Anniversary Banner",
+          "Welcome Banner",
+          "Balloon",
+          "Helium Balloon",
+          "Foil Balloon",
+          "Latex Balloon",
+          "Balloon Bouquet",
+          "Balloon Arch",
+          "Flower Bouquet",
+          "Rose Bouquet",
+          "Garland",
+          "Garland Decoration",
+          "Party Decoration",
+          "Baby Shower Decoration",
+          "Bride To Be Decoration",
+          "Groom To Be Decoration",
+          "Wedding Decoration",
+          "Engagement Decoration",
+          "Stage Decoration",
+          "Table Decoration",
+          "Room Decoration",
+          "Cabana Decoration",
+          "Canopy Decoration",
+          "Romantic Decoration",
+          "Candle Light Decoration",
+          "Candle Light Dinner Setup",
+          "LED Decoration",
+          "Fairy Lights",
+          "LED Lights",
+          "Photo Booth",
+          "Photo Frame",
+          "Props",
+          "Birthday Props",
+          "Party Props",
+          "Confetti",
+          "Confetti Cannon",
+          "Ribbon",
+          "Gift Wrap",
+          "Gift Packing",
+          "Gift Box",
+          "Gift Bag",
+          "Greeting Card",
+          "Birthday Card",
+          "Anniversary Card",
+          "Invitation Card",
+          "Return Gift",
+          "Party Kit",
+          "Celebration Kit",
+          "Decoration Kit",
+          "Event Setup",
+          "Event Charge",
+          "Celebration Charge",
+          "Cake Cutting Charge",
+          "Photography Charge",
+          "Videography Charge",
+          "Music Charge",
+          "Live Band",
+          "Live Singer",
+          "Magic Show",
+          "Mascot",
+          "Clown Service",
+          "Anchor Service",
+          "Emcee",
+          "Host Service",
+          "Sound System",
+          "Speaker Rent",
+          "Mic Rent",
+          "Projector Rent",
+          "Screen Rent",
+          "Table Rent",
+          "Chair Rent",
+          "Tent Rent",
+          "Hall Decoration",
+          "Banquet Decoration",
+          "Room Rent",
+          "Banquet Hall",
+          "Conference Hall",
+          "Meeting Room",
+          "Reservation Charge",
+          "Advance Booking",
+          "Booking Charge",
+          /* --- additional common non-food / accessory / charge items --- */
+          "Ear Buds",
+          "Cotton Buds",
+          "Cotton Swab",
+          "Sanitary Napkin",
+          "Sanitary Pad",
+          "Face Mask",
+          "Mask",
+          "Hand Gloves",
+          "Kitchen Towel",
+          "Paper Towel",
+          "Kitchen Roll",
+          "Toilet Paper",
+          "Toilet Roll",
+          "Baby Bib",
+          "Bib",
+          "High Chair",
+          "Booster Seat",
+          "Aluminium Foil",
+          "Foil Paper",
+          "Cling Wrap",
+          "Cling Film",
+          "Butter Paper",
+          "Wax Paper",
+          "Silver Foil",
+          "Doggy Bag",
+          "Courier Charge",
+          "Delivery Fee",
+          "GST",
+          "Service Tax",
+          "VAT",
+          "CGST",
+          "SGST",
+          "Round Off Charge",
+          "Ice Bag",
+          "Dry Ice",
+          "Charcoal",
+          "Hookah Coal",
+          "Shisha Coal",
+          "Flavour Charge",
+          "Cake Candle",
+          "Sparkling Candle",
+          "Cake Knife",
+          "Return Gift Box",
+          "Wet Tissue",
+          "Moist Tissue",
+          "Air Freshener",
+          "Room Freshener",
+          "Mosquito Repellent",
+          "Mosquito Coil",
+          "Insect Repellent",
+          "First Aid",
+          "Band Aid",
+          "Newspaper",
+          "Magazine",
+          "SIM Card",
+          "Recharge Voucher",
+          "Data Card",
+          "Umbrella",
+          "Raincoat",
+          "Torch",
+          "Candle",
+          "Match Stick",
+          "Matches",
+          "Lighter Gas",
+          "Incense Stick",
+          "Agarbatti",
+          "Room Spray",
+          "Perfume",
+          "Deodorant",
+          "Toothbrush",
+          "Comb",
+          "Shaving Kit",
+          "Razor",
+          "Shower Cap",
+          "Bathroom Slipper",
+          "Slipper",
+          "Hanger",
+          "Laundry Bag",
+          "Iron Charge",
+          "Wifi Charge",
+          "Internet Charge",
+          "Parking Charge",
+          "Valet Charge",
+          "Corkage Charge",
+          "Corkage Fee",
+          "Music License Fee",
+          "AC Charge",
+          "Generator Charge",
+          "Power Backup Charge",
+        ];
 
-    <div id="page-areasheet" class="page">
-      <div class="controls" style="margin-bottom: 24px">
-        <button class="btn btn-secondary" id="backToMergeBtn2">← Back to Merge Tool</button>
-      </div>
+        const NONFOOD_CONTEXT_EXCEPTIONS = [
+          ["water", "bottle"],
+          ["mineral water", "bottle"],
+          ["drinking water", "bottle"],
+          ["juice", "bottle"],
+          ["soft drink", "bottle"],
+          ["cold drink", "bottle"],
+          ["water", "glass"],
+          ["juice", "glass"],
+          ["water", "cup"],
+        ];
 
-      <!-- ============ AREA-WISE PRICE SHEET SECTION ============ -->
-      <div class="glass-card info-banner">
-        <span class="ic">📍</span>
-        <div><b>Item Area-wise Price Sheet</b> — for sheets with multiple area/channel price columns side by side (e.g.
-          AC/Dine-in, Zomato or Swiggy, Easy Cater), each followed immediately by its own Available column. For every
-          row: <b>Easy Cater's price</b> is copied from the <b>AC (Dine-in) price column</b>, and <b>Easy Cater's
-            Available</b> is copied from the <b>Zomato/Swiggy Available column</b> (the column right after whichever
-          area column you pick below). Applies to the whole sheet, top to bottom.</div>
-      </div>
+        function normalizeName(name) {
+          if (name === undefined || name === null) return "";
+          return String(name).replace(/\s+/g, " ").trim().toLowerCase();
+        }
 
-      <div class="glass-card upload-card" id="areaSheetCard" style="max-width: 500px; margin: 0 auto 24px">
-        <input type="file" id="areaSheetInput" accept=".csv" />
-        <span class="upload-icon">📍</span>
-        <div class="upload-title">Area-wise Price Sheet CSV</div>
-        <div class="upload-sub">Drag &amp; drop or click to upload</div>
-        <div class="upload-filename" id="areaSheetFilename" style="display: none"></div>
-      </div>
+        function stripBOM(text) {
+          return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+        }
 
-      <div class="glass-card config-section" id="areaSheetPickerSection" style="display: none">
-        <div class="config-label" style="margin-bottom: 14px">🎯 Column Picker</div>
-        <div class="config-hint" style="margin-bottom: 16px">Pick the 3 area columns below. The "Available" column for
-          each is assumed to be the column immediately to its right (e.g. picking "Zomato" uses the very next column as
-          Zomato's Available).</div>
-        <div class="picker-row">
-          <label for="acColumnSelect">AC / Dine-in Price Column <span class="picker-sub">(source for Easy Cater
-              price)</span></label>
-          <select id="acColumnSelect"></select>
-        </div>
-        <div class="picker-row">
-          <label for="zomatoColumnSelect">Zomato / Swiggy Price Column <span class="picker-sub">(its next column =
-              Available source)</span></label>
-          <select id="zomatoColumnSelect"></select>
-        </div>
-        <div class="picker-row">
-          <label for="easyCaterColumnSelect">Easy Cater Price Column <span class="picker-sub">(target — its next column
-              = Available target)</span></label>
-          <select id="easyCaterColumnSelect"></select>
-        </div>
-      </div>
+        function getCell(row, idx) {
+          if (idx === undefined || idx === -1) return "";
+          return row[idx] !== undefined ? row[idx] : "";
+        }
 
-      <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px">
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statAreaSheetTotal">0</div>
-          <div class="stat-label">Total Rows</div>
-        </div>
-        <div class="glass-card stat-card">
-          <div class="stat-value" id="statAreaSheetUpdated">0</div>
-          <div class="stat-label">Rows Updated</div>
-        </div>
-      </div>
+        // Parse only a price-like value. This deliberately ignores non-price columns
+        // such as Short Code, even when they contain numeric values.
+        function parsePriceValue(value) {
+          if (value === undefined || value === null) return NaN;
+          let s = String(value).trim();
+          if (!s) return NaN;
 
-      <div class="controls">
-        <button class="btn btn-primary" id="areaSheetProcessBtn" disabled>⚡ Sync Easy Cater Columns</button>
-        <button class="btn btn-secondary" id="areaSheetResetBtn">↺ Reset</button>
-        <button class="btn btn-success" id="areaSheetDownloadBtn" disabled>⬇ Download Processed CSV</button>
-      </div>
+          // Remove currency symbols, whitespace and thousands separators.
+          s = s.replace(/[₹$€£]/g, "").replace(/\s+/g, "");
+          s = s.replace(/,/g, "");
 
-      <div class="glass-card progress-section" id="areaSheetProgressSection">
-        <div class="progress-label">
-          <span>Processing</span>
-          <span id="areaSheetProgressStatus">Preparing...</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="areaSheetProgressFill"></div>
-        </div>
-      </div>
+          // Accept values like (9.50) as negative numeric values.
+          const negative = /^\(.*\)$/.test(s);
+          if (negative) s = s.slice(1, -1);
 
-      <div class="glass-card result-section" id="areaSheetResultSection">
-        <div class="result-header">
-          <div class="check-icon">✓</div>
-          <h2>Area-wise Price Sheet Synced</h2>
-        </div>
-        <div class="result-summary" style="grid-template-columns: repeat(2, 1fr)">
-          <div class="result-item">
-            <div class="val" id="areaSheetResTotal">0</div>
-            <div class="lbl">Total Rows</div>
-          </div>
-          <div class="result-item">
-            <div class="val" id="areaSheetResTime">0ms</div>
-            <div class="lbl">Processing Time</div>
-          </div>
-        </div>
-        <div class="section-title">👀 Preview (first 10 rows)</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Item Name / Row</th>
-                <th>Easy Cater Price</th>
-                <th>Easy Cater Available</th>
-              </tr>
-            </thead>
-            <tbody id="areaSheetPreviewTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <!-- /#page-areasheet -->
+          // Keep only a conventional decimal number.
+          const match = s.match(/-?\d+(?:\.\d+)?/);
+          if (!match) return NaN;
 
-    <footer>
-      <strong>Menu Price Merger</strong><br />
-      Offline → Online Price Synchronizer
-    </footer>
-  </div>
+          const n = Number(match[0]);
+          return negative ? -n : n;
+        }
 
-  <script>
-    /* ======================================================================
- GLOBAL VARIABLES
-====================================================================== */
-    const state = {
-      offlineData: null,
-      onlineData: null,
-      offlineHeaderIndex: {},
-      onlineHeaderIndex: {},
-      finalRows: null, // array of arrays following ONLINE header structure
-      notFoundList: null, // online items with no offline price match {name, price}
-      offlineOnlyList: null, // offline-only items appended {name, price}
-      matchedCount: 0,
-      notFoundCount: 0,
-      offlineOnlyCount: 0,
-      suffixStrippedCount: 0,
-    };
+        function removeColumnIfExists(parsed, columnName) {
+          const idx = parsed.headers.findIndex(
+            (h) => normalizeName(h) === normalizeName(columnName),
+          );
+          if (idx === -1) return parsed;
+          return {
+            headers: parsed.headers.filter((_, i) => i !== idx),
+            rows: parsed.rows.map((row) => row.filter((_, i) => i !== idx)),
+          };
+        }
 
-    const REQUIRED_OFFLINE = ["item name", "price"];
-    const REQUIRED_ONLINE = ["item name", "price", "available"];
+        function parseCSV(text) {
+          text = stripBOM(text);
+          const rows = [];
+          let row = [];
+          let field = "";
+          let inQuotes = false;
 
-    // Final output header order (Online Menu structure)
-    const FINAL_HEADERS = ["Item ID", "Category", "Item Name", "Variation", "Online Display Name", "Area Display Name", "Item Type", "Price", "Description", "Dietary", "Available", "Goods/Services"];
+          for (let i = 0; i < text.length; i++) {
+            const char = text[i];
 
-    /* ======================================================================
- DOM REFERENCES
-====================================================================== */
-    const el = {
-      offlineCard: document.getElementById("offlineCard"),
-      onlineCard: document.getElementById("onlineCard"),
-      offlineInput: document.getElementById("offlineInput"),
-      onlineInput: document.getElementById("onlineInput"),
-      offlineFilename: document.getElementById("offlineFilename"),
-      onlineFilename: document.getElementById("onlineFilename"),
-
-      statOffline: document.getElementById("statOffline"),
-      statOnline: document.getElementById("statOnline"),
-      statMatched: document.getElementById("statMatched"),
-      statOfflineOnly: document.getElementById("statOfflineOnly"),
-      statFinalTotal: document.getElementById("statFinalTotal"),
-      statSuffixStripped: document.getElementById("statSuffixStripped"),
-      suffixCodeInput: document.getElementById("suffixCodeInput"),
-
-      mergeBtn: document.getElementById("mergeBtn"),
-      resetBtn: document.getElementById("resetBtn"),
-      downloadFinalBtn: document.getElementById("downloadFinalBtn"),
-      downloadOfflineOnlyBtn: document.getElementById("downloadOfflineOnlyBtn"),
-      downloadNotFoundBtn: document.getElementById("downloadNotFoundBtn"),
-
-      progressSection: document.getElementById("progressSection"),
-      progressStatus: document.getElementById("progressStatus"),
-      progressFill: document.getElementById("progressFill"),
-
-      resultSection: document.getElementById("resultSection"),
-      resMatched: document.getElementById("resMatched"),
-      resOfflineOnly: document.getElementById("resOfflineOnly"),
-      resNotFound: document.getElementById("resNotFound"),
-      resTime: document.getElementById("resTime"),
-      offlineOnlyTableBody: document.getElementById("offlineOnlyTableBody"),
-      notFoundTableBody: document.getElementById("notFoundTableBody"),
-
-      toastContainer: document.getElementById("toastContainer"),
-    };
-
-    /* ======================================================================
- TOAST NOTIFICATIONS
-====================================================================== */
-    function showToast(message, type = "info") {
-      const icons = { success: "✅", error: "❌", info: "ℹ️" };
-      const toast = document.createElement("div");
-      toast.className = `toast ${type}`;
-      toast.innerHTML = `<span class="icon">${icons[type] || icons.info}</span><span>${escapeHtml(message)}</span>`;
-      el.toastContainer.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add("hide");
-        setTimeout(() => toast.remove(), 350);
-      }, 3200);
-    }
-
-    /* ======================================================================
- UTILITIES
-====================================================================== */
-    function escapeHtml(str) {
-      const div = document.createElement("div");
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function normalizeName(name) {
-      if (name === undefined || name === null) return "";
-      return String(name).replace(/\s+/g, " ").trim().toLowerCase();
-    }
-
-    function stripBOM(text) {
-      if (text.charCodeAt(0) === 0xfeff) return text.slice(1);
-      return text;
-    }
-
-    function buildHeaderIndex(headers) {
-      const map = {};
-      headers.forEach((h, i) => {
-        map[normalizeName(h)] = i;
-      });
-      return map;
-    }
-
-    // Fully removes a column (by name, case-insensitive) from parsed CSV data if present.
-    // Returns { headers, rows } unchanged if the column doesn't exist.
-    function removeColumnIfExists(parsed, columnName) {
-      const idx = parsed.headers.findIndex((h) => normalizeName(h) === normalizeName(columnName));
-      if (idx === -1) return parsed;
-      const newHeaders = parsed.headers.filter((_, i) => i !== idx);
-      const newRows = parsed.rows.map((row) => row.filter((_, i) => i !== idx));
-      return { headers: newHeaders, rows: newRows };
-    }
-
-    function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-
-    // Strip a trailing suffix code (e.g. "[O]", "[online]") from an item name.
-    // Case-insensitive, tolerant of a space (or no space) before the code.
-    // Returns { cleaned, wasStripped }.
-    function stripSuffixCode(name, code) {
-      if (!code) return { cleaned: name, wasStripped: false };
-      const trimmedName = String(name).trim();
-      const trimmedCode = String(code).trim();
-      if (trimmedCode === "") return { cleaned: name, wasStripped: false };
-
-      const lowerName = trimmedName.toLowerCase();
-      const lowerCode = trimmedCode.toLowerCase();
-
-      if (lowerName.endsWith(lowerCode)) {
-        let cleaned = trimmedName.slice(0, trimmedName.length - trimmedCode.length);
-        cleaned = cleaned.replace(/\s+$/, ""); // trim trailing space left behind
-        return { cleaned, wasStripped: true };
-      }
-      return { cleaned: name, wasStripped: false };
-    }
-
-    function getCell(row, idx) {
-      if (idx === undefined || idx === -1) return "";
-      return row[idx] !== undefined ? row[idx] : "";
-    }
-
-    /* ======================================================================
- CSV PARSER (manual, RFC4180-ish)
-====================================================================== */
-    function parseCSV(text) {
-      text = stripBOM(text);
-      const rows = [];
-      let row = [];
-      let field = "";
-      let inQuotes = false;
-      let i = 0;
-      const len = text.length;
-
-      while (i < len) {
-        const char = text[i];
-        if (inQuotes) {
-          if (char === '"') {
-            if (text[i + 1] === '"') {
-              field += '"';
-              i += 2;
+            if (inQuotes) {
+              if (char === '"') {
+                if (text[i + 1] === '"') {
+                  field += '"';
+                  i++;
+                } else {
+                  inQuotes = false;
+                }
+              } else {
+                field += char;
+              }
               continue;
+            }
+
+            if (char === '"') {
+              inQuotes = true;
+            } else if (char === ",") {
+              row.push(field);
+              field = "";
+            } else if (char === "\r") {
+              if (text[i + 1] === "\n") i++;
+              row.push(field);
+              rows.push(row);
+              row = [];
+              field = "";
+            } else if (char === "\n") {
+              row.push(field);
+              rows.push(row);
+              row = [];
+              field = "";
             } else {
-              inQuotes = false;
-              i++;
-              continue;
+              field += char;
             }
-          } else {
-            field += char;
-            i++;
-            continue;
           }
-        } else {
-          if (char === '"') {
-            inQuotes = true;
-            i++;
-            continue;
-          } else if (char === ",") {
-            row.push(field);
-            field = "";
-            i++;
-            continue;
-          } else if (char === "\r") {
-            if (text[i + 1] === "\n") {
-              i++;
-            }
+
+          if (field.length > 0 || row.length > 0) {
             row.push(field);
             rows.push(row);
-            row = [];
-            field = "";
-            i++;
-            continue;
-          } else if (char === "\n") {
-            row.push(field);
-            rows.push(row);
-            row = [];
-            field = "";
-            i++;
-            continue;
-          } else {
-            field += char;
-            i++;
-            continue;
           }
-        }
-      }
-      if (field.length > 0 || row.length > 0) {
-        row.push(field);
-        rows.push(row);
-      }
 
-      while (rows.length && rows[rows.length - 1].every((c) => c === "")) rows.pop();
-      if (rows.length === 0) return { headers: [], rows: [] };
-
-      const headers = rows[0].map((h) => h.trim());
-      const dataRows = rows.slice(1).filter((r) => !(r.length === 1 && r[0] === ""));
-      return { headers, rows: dataRows };
-    }
-
-    /* ======================================================================
- CSV READER
-====================================================================== */
-    function readFileAsText(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error("Failed to read file"));
-        reader.readAsText(file, "UTF-8");
-      });
-    }
-
-    /* ======================================================================
- VALIDATION
-====================================================================== */
-    function validateHeaders(headers, required) {
-      const normalized = headers.map((h) => normalizeName(h));
-      return required.every((req) => normalized.includes(req));
-    }
-
-    /* ======================================================================
- DRAG & DROP + FILE HANDLING
-====================================================================== */
-    function setupDropZone(cardEl, inputEl, onFile) {
-      cardEl.addEventListener("click", () => inputEl.click());
-      inputEl.addEventListener("change", (e) => {
-        if (e.target.files.length) onFile(e.target.files[0]);
-      });
-      ["dragenter", "dragover"].forEach((evt) => {
-        cardEl.addEventListener(evt, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          cardEl.classList.add("dragover");
-        });
-      });
-      ["dragleave", "drop"].forEach((evt) => {
-        cardEl.addEventListener(evt, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          cardEl.classList.remove("dragover");
-        });
-      });
-      cardEl.addEventListener("drop", (e) => {
-        const files = e.dataTransfer.files;
-        if (files.length) onFile(files[0]);
-      });
-    }
-
-    async function handleOfflineFile(file) {
-      if (!file.name.toLowerCase().endsWith(".csv")) {
-        showToast("Please upload a valid .csv file", "error");
-        return;
-      }
-      try {
-        const text = await readFileAsText(file);
-        const parsed = removeColumnIfExists(parseCSV(text), "Markup Price");
-        if (!validateHeaders(parsed.headers, REQUIRED_OFFLINE)) {
-          showToast("Invalid Offline CSV: missing Item Name or Price column", "error");
-          return;
-        }
-        state.offlineData = parsed;
-        state.offlineHeaderIndex = buildHeaderIndex(parsed.headers);
-        el.offlineFilename.textContent = file.name;
-        el.offlineFilename.style.display = "inline-block";
-        el.offlineCard.classList.add("loaded");
-        el.statOffline.textContent = parsed.rows.length;
-        showToast("Offline Menu Loaded", "success");
-        updateMergeButtonState();
-      } catch (err) {
-        showToast("Failed to read Offline CSV", "error");
-        console.error(err);
-      }
-    }
-
-    async function handleOnlineFile(file) {
-      if (!file.name.toLowerCase().endsWith(".csv")) {
-        showToast("Please upload a valid .csv file", "error");
-        return;
-      }
-      try {
-        const text = await readFileAsText(file);
-        const parsed = removeColumnIfExists(parseCSV(text), "Markup Price");
-        if (!validateHeaders(parsed.headers, REQUIRED_ONLINE)) {
-          showToast("Invalid Online CSV: missing Item Name, Price or Available column", "error");
-          return;
-        }
-        state.onlineData = parsed;
-        state.onlineHeaderIndex = buildHeaderIndex(parsed.headers);
-        el.onlineFilename.textContent = file.name;
-        el.onlineFilename.style.display = "inline-block";
-        el.onlineCard.classList.add("loaded");
-        el.statOnline.textContent = parsed.rows.length;
-        showToast("Online Menu Loaded", "success");
-        updateMergeButtonState();
-      } catch (err) {
-        showToast("Failed to read Online CSV", "error");
-        console.error(err);
-      }
-    }
-
-    function updateMergeButtonState() {
-      el.mergeBtn.disabled = !(state.offlineData && state.onlineData);
-    }
-
-    setupDropZone(el.offlineCard, el.offlineInput, handleOfflineFile);
-    setupDropZone(el.onlineCard, el.onlineInput, handleOnlineFile);
-
-    /* ======================================================================
- PROGRESS BAR HELPERS
-====================================================================== */
-    function showProgress() {
-      el.progressSection.classList.add("active");
-      setProgress(0, "Preparing...");
-    }
-    function hideProgress() {
-      el.progressSection.classList.remove("active");
-    }
-    function setProgress(percent, label) {
-      el.progressFill.style.width = percent + "%";
-      el.progressStatus.textContent = label;
-    }
-
-    /* ======================================================================
- STATISTICS UPDATE
-====================================================================== */
-    function updateStats() {
-      el.statOffline.textContent = state.offlineData ? state.offlineData.rows.length : 0;
-      el.statOnline.textContent = state.onlineData ? state.onlineData.rows.length : 0;
-      el.statMatched.textContent = state.matchedCount;
-      el.statOfflineOnly.textContent = state.offlineOnlyCount;
-      el.statFinalTotal.textContent = state.finalRows ? state.finalRows.length : 0;
-      el.statSuffixStripped.textContent = state.suffixStrippedCount;
-    }
-
-    /* ======================================================================
- MATCHING / MERGE ENGINE
- Step 1: Build offline lookup Map: normalized item name -> offline row
- Step 2: Walk online rows, build final rows (online structure), replace
-         Price with offline price when matched (else keep online price),
-         keep Available exactly as in online file.
- Step 3: Walk offline rows; any normalized name NOT already present in
-         the online lookup gets appended as a new row (mapped into the
-         online column structure) with Available forced to "No".
- No nested loops — Map lookups are O(1).
-====================================================================== */
-    async function runMerge() {
-      const startTime = performance.now();
-      el.mergeBtn.disabled = true;
-      el.downloadFinalBtn.disabled = true;
-      el.downloadOfflineOnlyBtn.disabled = true;
-      el.downloadNotFoundBtn.disabled = true;
-      el.resultSection.classList.remove("active");
-
-      showProgress();
-      await sleep(120);
-      setProgress(8, "Preparing...");
-      await sleep(150);
-
-      setProgress(20, "Reading Offline Menu...");
-      const offlineRows = state.offlineData.rows;
-      const offIdx = state.offlineHeaderIndex;
-      const oName = offIdx["item name"],
-        oPrice = offIdx["price"];
-      const oId = offIdx["item id"],
-        oCat = offIdx["category"],
-        oVar = offIdx["variation"];
-      const oDisp = offIdx["online display name"],
-        oType = offIdx["item type"];
-      const oDesc = offIdx["description"],
-        oDiet = offIdx["dietary"],
-        oGoods = offIdx["goods/services"];
-      await sleep(150);
-
-      setProgress(35, "Reading Online Menu...");
-      const onlineRows = state.onlineData.rows;
-      const onIdx = state.onlineHeaderIndex;
-      const nName = onIdx["item name"],
-        nPrice = onIdx["price"],
-        nAvail = onIdx["available"];
-      const suffixCode = (el.suffixCodeInput.value || "").trim();
-      let suffixStripped = 0;
-      await sleep(150);
-
-      setProgress(50, "Building Lookup...");
-      // Map: normalized name -> offline row (first occurrence wins)
-      const offlineMap = new Map();
-      for (let i = 0; i < offlineRows.length; i++) {
-        const r = offlineRows[i];
-        const key = normalizeName(getCell(r, oName));
-        if (key === "") continue;
-        if (!offlineMap.has(key)) offlineMap.set(key, r);
-      }
-      await sleep(150);
-
-      setProgress(65, "Matching Prices...");
-      let matched = 0;
-      const notFound = [];
-      const finalRows = [];
-      const seenNames = new Set(); // normalized names already placed into finalRows (from online)
-
-      for (let i = 0; i < onlineRows.length; i++) {
-        const srcRow = onlineRows[i];
-        const newRow = new Array(FINAL_HEADERS.length).fill("");
-        // copy every column that exists in the online file, aligned to FINAL_HEADERS
-        FINAL_HEADERS.forEach((h, colIdx) => {
-          const key = normalizeName(h);
-          const srcIdx = onIdx[key];
-          if (srcIdx !== undefined) newRow[colIdx] = getCell(srcRow, srcIdx);
-        });
-
-        const rawItemName = getCell(srcRow, nName);
-        const { cleaned: itemName, wasStripped } = stripSuffixCode(rawItemName, suffixCode);
-        if (wasStripped) suffixStripped++;
-        const key = normalizeName(itemName);
-        seenNames.add(key);
-
-        // write the cleaned (suffix-free) name into the final Item Name column
-        const nameColIdx = FINAL_HEADERS.findIndex((h) => normalizeName(h) === "item name");
-        newRow[nameColIdx] = itemName;
-
-        const priceColIdx = FINAL_HEADERS.findIndex((h) => normalizeName(h) === "price");
-        if (offlineMap.has(key)) {
-          const offRow = offlineMap.get(key);
-          newRow[priceColIdx] = getCell(offRow, oPrice);
-          matched++;
-        } else {
-          notFound.push({ name: itemName, price: getCell(srcRow, nPrice) });
-        }
-        finalRows.push(newRow);
-      }
-      await sleep(150);
-
-      setProgress(80, "Adding Offline-Only Items...");
-      const offlineOnly = [];
-      const availColIdx = FINAL_HEADERS.findIndex((h) => normalizeName(h) === "available");
-      const priceColIdx2 = FINAL_HEADERS.findIndex((h) => normalizeName(h) === "price");
-
-      for (let i = 0; i < offlineRows.length; i++) {
-        const r = offlineRows[i];
-        const itemName = getCell(r, oName);
-        const key = normalizeName(itemName);
-        if (key === "" || seenNames.has(key)) continue;
-        seenNames.add(key); // avoid duplicate offline-only rows with same name
-
-        const newRow = new Array(FINAL_HEADERS.length).fill("");
-        newRow[FINAL_HEADERS.indexOf("Item ID")] = getCell(r, oId);
-        newRow[FINAL_HEADERS.indexOf("Category")] = getCell(r, oCat);
-        newRow[FINAL_HEADERS.indexOf("Item Name")] = itemName;
-        newRow[FINAL_HEADERS.indexOf("Variation")] = getCell(r, oVar);
-        newRow[FINAL_HEADERS.indexOf("Online Display Name")] = getCell(r, oDisp);
-        newRow[FINAL_HEADERS.indexOf("Area Display Name")] = ""; // not present offline
-        newRow[FINAL_HEADERS.indexOf("Item Type")] = getCell(r, oType);
-        newRow[priceColIdx2] = getCell(r, oPrice);
-        newRow[FINAL_HEADERS.indexOf("Description")] = getCell(r, oDesc);
-        newRow[FINAL_HEADERS.indexOf("Dietary")] = getCell(r, oDiet);
-        newRow[availColIdx] = "No"; // not sold online
-        newRow[FINAL_HEADERS.indexOf("Goods/Services")] = getCell(r, oGoods);
-
-        finalRows.push(newRow);
-        offlineOnly.push({ name: itemName, price: getCell(r, oPrice) });
-      }
-      await sleep(150);
-
-      setProgress(92, "Generating Output...");
-      state.finalRows = finalRows;
-      state.notFoundList = notFound;
-      state.offlineOnlyList = offlineOnly;
-      state.matchedCount = matched;
-      state.notFoundCount = notFound.length;
-      state.offlineOnlyCount = offlineOnly.length;
-      state.suffixStrippedCount = suffixStripped;
-      await sleep(150);
-
-      setProgress(100, "Completed");
-      await sleep(250);
-      hideProgress();
-
-      const elapsed = Math.round(performance.now() - startTime);
-      displayResults(elapsed);
-      updateStats();
-
-      el.downloadFinalBtn.disabled = false;
-      el.downloadOfflineOnlyBtn.disabled = state.offlineOnlyCount === 0;
-      el.downloadNotFoundBtn.disabled = state.notFoundCount === 0;
-      el.mergeBtn.disabled = false;
-
-      showToast("Merge Completed", "success");
-      if (suffixCode && suffixStripped > 0) {
-        showToast(`Stripped "${suffixCode}" from ${suffixStripped} online item name(s)`, "info");
-      } else if (suffixCode && suffixStripped === 0) {
-        showToast(`No online item names ended with "${suffixCode}"`, "info");
-      }
-    }
-
-    /* ======================================================================
- RESULT DISPLAY
-====================================================================== */
-    function displayResults(elapsedMs) {
-      el.resultSection.classList.add("active");
-      el.resMatched.textContent = state.matchedCount;
-      el.resOfflineOnly.textContent = state.offlineOnlyCount;
-      el.resNotFound.textContent = state.notFoundCount;
-      el.resTime.textContent = elapsedMs + "ms";
-
-      el.offlineOnlyTableBody.innerHTML = "";
-      if (state.offlineOnlyList.length === 0) {
-        el.offlineOnlyTableBody.innerHTML = `<tr><td colspan="3" class="empty-state">No extra offline-only items found.</td></tr>`;
-      } else {
-        const frag = document.createDocumentFragment();
-        state.offlineOnlyList.forEach((item, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${idx + 1}</td><td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.price)}</td>`;
-          frag.appendChild(tr);
-        });
-        el.offlineOnlyTableBody.appendChild(frag);
-      }
-
-      el.notFoundTableBody.innerHTML = "";
-      if (state.notFoundList.length === 0) {
-        el.notFoundTableBody.innerHTML = `<tr><td colspan="3" class="empty-state">🎉 Every online item had a matching offline price!</td></tr>`;
-      } else {
-        const frag = document.createDocumentFragment();
-        state.notFoundList.forEach((item, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${idx + 1}</td><td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.price)}</td>`;
-          frag.appendChild(tr);
-        });
-        el.notFoundTableBody.appendChild(frag);
-      }
-    }
-
-    /* ======================================================================
- CSV GENERATOR
-====================================================================== */
-    function escapeCSVField(value) {
-      if (value === undefined || value === null) value = "";
-      value = String(value);
-      if (/[",\n\r]/.test(value)) return '"' + value.replace(/"/g, '""') + '"';
-      return value;
-    }
-
-    function generateFinalCSV() {
-      const lines = [FINAL_HEADERS.map(escapeCSVField).join(",")];
-      for (const row of state.finalRows) lines.push(row.map(escapeCSVField).join(","));
-      return lines.join("\r\n");
-    }
-
-    function generateOfflineOnlyCSV() {
-      const lines = ["Item Name,Price"];
-      for (const item of state.offlineOnlyList) {
-        lines.push(`${escapeCSVField(item.name)},${escapeCSVField(item.price)}`);
-      }
-      return lines.join("\r\n");
-    }
-
-    function generateNotFoundCSV() {
-      const lines = ["Item Name,Online Price (Kept)"];
-      for (const item of state.notFoundList) {
-        lines.push(`${escapeCSVField(item.name)},${escapeCSVField(item.price)}`);
-      }
-      return lines.join("\r\n");
-    }
-
-    /* ======================================================================
- DOWNLOAD FUNCTIONS
-====================================================================== */
-    function downloadTextAsFile(text, filename) {
-      const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    el.downloadFinalBtn.addEventListener("click", () => {
-      if (!state.finalRows) return;
-      downloadTextAsFile(generateFinalCSV(), "final_merged_menu.csv");
-      showToast("Download Ready", "success");
-    });
-
-    el.downloadOfflineOnlyBtn.addEventListener("click", () => {
-      if (!state.offlineOnlyList) return;
-      downloadTextAsFile(generateOfflineOnlyCSV(), "offline_only_added_items.csv");
-      showToast("Download Ready", "success");
-    });
-
-    el.downloadNotFoundBtn.addEventListener("click", () => {
-      if (!state.notFoundList) return;
-      downloadTextAsFile(generateNotFoundCSV(), "online_items_no_offline_price.csv");
-      showToast("Download Ready", "success");
-    });
-
-    /* ======================================================================
- MERGE BUTTON
-====================================================================== */
-    el.mergeBtn.addEventListener("click", () => {
-      if (!state.offlineData || !state.onlineData) {
-        showToast("Please upload both CSV files first", "error");
-        return;
-      }
-      runMerge();
-    });
-
-    /* ======================================================================
- RESET
-====================================================================== */
-    function resetAll() {
-      state.offlineData = null;
-      state.onlineData = null;
-      state.offlineHeaderIndex = {};
-      state.onlineHeaderIndex = {};
-      state.finalRows = null;
-      state.notFoundList = null;
-      state.offlineOnlyList = null;
-      state.matchedCount = 0;
-      state.notFoundCount = 0;
-      state.offlineOnlyCount = 0;
-      state.suffixStrippedCount = 0;
-
-      el.suffixCodeInput.value = "";
-      el.offlineInput.value = "";
-      el.onlineInput.value = "";
-      el.offlineFilename.textContent = "";
-      el.offlineFilename.style.display = "none";
-      el.onlineFilename.textContent = "";
-      el.onlineFilename.style.display = "none";
-      el.offlineCard.classList.remove("loaded");
-      el.onlineCard.classList.remove("loaded");
-
-      el.mergeBtn.disabled = true;
-      el.downloadFinalBtn.disabled = true;
-      el.downloadOfflineOnlyBtn.disabled = true;
-      el.downloadNotFoundBtn.disabled = true;
-
-      hideProgress();
-      el.resultSection.classList.remove("active");
-      el.offlineOnlyTableBody.innerHTML = "";
-      el.notFoundTableBody.innerHTML = "";
-
-      updateStats();
-      showToast("Everything reset", "info");
-    }
-
-    el.resetBtn.addEventListener("click", resetAll);
-
-    /* ======================================================================
- DINE-IN ONLY PROCESSOR — independent tool (no online file needed)
- Adds an "Area Display Name" column after "Online Display Name", and
- marks known non-food / non-eatable items as Available = "No" using
- whole-word matching against an editable keyword list.
-====================================================================== */
-
-    // Default non-food / non-eatable keyword list (user-provided list + additional common POS items)
-    const DEFAULT_NONFOOD_KEYWORDS = [
-      "Tissue",
-      "Tissue Paper",
-      "Paper Napkin",
-      "Napkin",
-      "Wet Wipe",
-      "Wet Wipes",
-      "Wipe",
-      "Toothpick",
-      "Straw",
-      "Paper Straw",
-      "Plastic Straw",
-      "Spoon",
-      "Plastic Spoon",
-      "Wooden Spoon",
-      "Fork",
-      "Knife",
-      "Chopsticks",
-      "Plate",
-      "Disposable Plate",
-      "Bowl",
-      "Disposable Bowl",
-      "Glass",
-      "Disposable Glass",
-      "Cup",
-      "Disposable Cup",
-      "Cutlery",
-      "Disposable Cutlery",
-      "Tray",
-      "Carry Bag",
-      "Paper Bag",
-      "Plastic Bag",
-      "Shopping Bag",
-      "Food Container",
-      "Container",
-      "Disposable Container",
-      "Packaging",
-      "Packaging Charge",
-      "Packing",
-      "Packing Charge",
-      "Parcel Charge",
-      "Parcel Packing",
-      "Takeaway Box",
-      "Pizza Box",
-      "Cake Box",
-      "Burger Box",
-      "Bottle Deposit",
-      "Jar Deposit",
-      "Deposit",
-      "Security Deposit",
-      "Container Deposit",
-      "Delivery Charge",
-      "Packing Fee",
-      "Packaging Fee",
-      "Handling Charge",
-      "Convenience Fee",
-      "Service Charge",
-      "Cover Charge",
-      "Entry Fee",
-      "Reservation Fee",
-      "Table Booking",
-      "Table Reservation",
-      "Birthday Decoration",
-      "Anniversary Decoration",
-      "Decoration Charge",
-      "Balloon Decoration",
-      "Flower Decoration",
-      "Candle Light Dinner",
-      "Live Music Charge",
-      "DJ Charge",
-      "Banquet Charge",
-      "Hall Rent",
-      "Room Charge",
-      "Extra Plate",
-      "Extra Bowl",
-      "Extra Spoon",
-      "Extra Fork",
-      "Extra Knife",
-      "Extra Cup",
-      "Extra Glass",
-      "Ice Charge",
-      "Cooling Charge",
-      "Empty Glass",
-      "Empty Bottle",
-      "Match Box",
-      "Lighter",
-      "Gift Voucher",
-      "Gift Card",
-      "Membership Card",
-      "Loyalty Card",
-      "Recharge Coupon",
-      "Coupon Redemption",
-      "Wallet Redemption",
-      "Token",
-      "Discount",
-      "Discount Amount",
-      "Flat Discount",
-      "Percentage Discount",
-      "Round Off",
-      "Roundoff",
-      "Adjustment",
-      "Cash Adjustment",
-      "Credit Adjustment",
-      "Debit Adjustment",
-      "Advance",
-      "Advance Payment",
-      "Balance",
-      "Refund",
-      "Refund Amount",
-      "Credit Note",
-      "Complimentary",
-      "Comp",
-      "Staff Meal",
-      "Employee Meal",
-      "Staff Discount",
-      "Dummy Item",
-      "Test Item",
-      "Sample Item",
-      "Cancel Item",
-      "Deleted Item",
-      "POS Adjustment",
-      "Manual Adjustment",
-      "Raw Rice",
-      "Rice Bag",
-      "Flour",
-      "Maida",
-      "Atta",
-      "Cooking Oil",
-      "Refined Oil",
-      "Gas Cylinder",
-      "LPG Cylinder",
-      "Detergent",
-      "Cleaning Powder",
-      "Dishwash Liquid",
-      "Sanitizer",
-      "Hand Sanitizer",
-      "Gloves",
-      "Apron",
-      "Kitchen Cloth",
-      "Garbage Bag",
-      "Cleaning Charge",
-      "Maintenance Charge",
-      "Service Fee",
-      "Cigarette",
-      "Cigarettes",
-      "Cigar",
-      "Beedi",
-      "Bidi",
-      "Tobacco",
-      "Chewing Tobacco",
-      "Gutkha",
-      "Pan Masala",
-      "Hookah",
-      "Hukka",
-      "Shisha",
-      "Vape",
-      "E-Cigarette",
-      "Nicotine",
-      "Beer",
-      "Draft Beer",
-      "Draught Beer",
-      "Craft Beer",
-      "Lager",
-      "Ale",
-      "Stout",
-      "IPA",
-      "Pilsner",
-      "Wheat Beer",
-      "Strong Beer",
-      "Light Beer",
-      "Pint",
-      "Mug Beer",
-      "Pitcher Beer",
-      "Tower Beer",
-      "Wine",
-      "Red Wine",
-      "White Wine",
-      "Rose Wine",
-      "Rosé",
-      "Sparkling Wine",
-      "Champagne",
-      "Prosecco",
-      "Sangria",
-      "Whisky",
-      "Whiskey",
-      "Scotch",
-      "Single Malt",
-      "Double Malt",
-      "Blended Whisky",
-      "Bourbon",
-      "Rye Whiskey",
-      "Irish Whiskey",
-      "Japanese Whisky",
-      "Rum",
-      "Dark Rum",
-      "White Rum",
-      "Gold Rum",
-      "Spiced Rum",
-      "Old Monk",
-      "Bacardi",
-      "Vodka",
-      "Flavoured Vodka",
-      "Absolut",
-      "Smirnoff",
-      "Grey Goose",
-      "Gin",
-      "London Dry Gin",
-      "Bombay Gin",
-      "Tequila",
-      "Silver Tequila",
-      "Gold Tequila",
-      "Reposado",
-      "Anejo",
-      "Añejo",
-      "Brandy",
-      "Cognac",
-      "Liqueur",
-      "Baileys",
-      "Kahlua",
-      "Kahlúa",
-      "Malibu",
-      "Triple Sec",
-      "Cointreau",
-      "Amaretto",
-      "Sambuca",
-      "Jagermeister",
-      "Jägermeister",
-      "Mead",
-      "Cider",
-      "Hard Cider",
-      "Sake",
-      "Soju",
-      "Cocktail",
-      "Alcoholic Cocktail",
-      "Margarita",
-      "Martini",
-      "Cosmopolitan",
-      "Bloody Mary",
-      "Long Island Iced Tea",
-      "Old Fashioned",
-      "Manhattan",
-      "Negroni",
-      "Daiquiri",
-      "Pina Colada",
-      "Piña Colada",
-      "Whiskey Sour",
-      "Gin and Tonic",
-      "Gin & Tonic",
-      "Rum and Coke",
-      "Rum & Coke",
-      "Screwdriver",
-      "Peg",
-      "Small Peg",
-      "Large Peg",
-      "Quarter",
-      "Half Bottle",
-      "Full Bottle",
-      "Bottle",
-      "Mini Bottle",
-      "Shot",
-      "Shots",
-      "Shooter",
-      "Alcohol",
-      "Liquor",
-      "Spirit",
-      "Spirits",
-      "Hard Liquor",
-      "Hard Drink",
-      "IMFL",
-      "Imported Liquor",
-      "Indian Made Foreign Liquor",
-      "Birthday Cake Topper",
-      "Cake Topper",
-      "Birthday Candle",
-      "Number Candle",
-      "Sparkle Candle",
-      "Sparkler",
-      "Party Popper",
-      "Birthday Cap",
-      "Birthday Hat",
-      "Party Hat",
-      "Birthday Banner",
-      "Happy Birthday Banner",
-      "Anniversary Banner",
-      "Welcome Banner",
-      "Balloon",
-      "Helium Balloon",
-      "Foil Balloon",
-      "Latex Balloon",
-      "Balloon Bouquet",
-      "Balloon Arch",
-      "Flower Bouquet",
-      "Rose Bouquet",
-      "Garland",
-      "Garland Decoration",
-      "Party Decoration",
-      "Baby Shower Decoration",
-      "Bride To Be Decoration",
-      "Groom To Be Decoration",
-      "Wedding Decoration",
-      "Engagement Decoration",
-      "Stage Decoration",
-      "Table Decoration",
-      "Room Decoration",
-      "Cabana Decoration",
-      "Canopy Decoration",
-      "Romantic Decoration",
-      "Candle Light Decoration",
-      "Candle Light Dinner Setup",
-      "LED Decoration",
-      "Fairy Lights",
-      "LED Lights",
-      "Photo Booth",
-      "Photo Frame",
-      "Props",
-      "Birthday Props",
-      "Party Props",
-      "Confetti",
-      "Confetti Cannon",
-      "Ribbon",
-      "Gift Wrap",
-      "Gift Packing",
-      "Gift Box",
-      "Gift Bag",
-      "Greeting Card",
-      "Birthday Card",
-      "Anniversary Card",
-      "Invitation Card",
-      "Return Gift",
-      "Party Kit",
-      "Celebration Kit",
-      "Decoration Kit",
-      "Event Setup",
-      "Event Charge",
-      "Celebration Charge",
-      "Cake Cutting Charge",
-      "Photography Charge",
-      "Videography Charge",
-      "Music Charge",
-      "Live Band",
-      "Live Singer",
-      "Magic Show",
-      "Mascot",
-      "Clown Service",
-      "Anchor Service",
-      "Emcee",
-      "Host Service",
-      "Sound System",
-      "Speaker Rent",
-      "Mic Rent",
-      "Projector Rent",
-      "Screen Rent",
-      "Table Rent",
-      "Chair Rent",
-      "Tent Rent",
-      "Hall Decoration",
-      "Banquet Decoration",
-      "Room Rent",
-      "Banquet Hall",
-      "Conference Hall",
-      "Meeting Room",
-      "Reservation Charge",
-      "Advance Booking",
-      "Booking Charge",
-      /* --- additional common non-food / accessory / charge items --- */
-      "Ear Buds",
-      "Cotton Buds",
-      "Cotton Swab",
-      "Sanitary Napkin",
-      "Sanitary Pad",
-      "Face Mask",
-      "Mask",
-      "Hand Gloves",
-      "Kitchen Towel",
-      "Paper Towel",
-      "Kitchen Roll",
-      "Toilet Paper",
-      "Toilet Roll",
-      "Baby Bib",
-      "Bib",
-      "High Chair",
-      "Booster Seat",
-      "Aluminium Foil",
-      "Foil Paper",
-      "Cling Wrap",
-      "Cling Film",
-      "Butter Paper",
-      "Wax Paper",
-      "Silver Foil",
-      "Doggy Bag",
-      "Courier Charge",
-      "Delivery Fee",
-      "GST",
-      "Service Tax",
-      "VAT",
-      "CGST",
-      "SGST",
-      "Round Off Charge",
-      "Ice Bag",
-      "Dry Ice",
-      "Charcoal",
-      "Hookah Coal",
-      "Shisha Coal",
-      "Flavour Charge",
-      "Cake Candle",
-      "Sparkling Candle",
-      "Cake Knife",
-      "Return Gift Box",
-      "Wet Tissue",
-      "Moist Tissue",
-      "Air Freshener",
-      "Room Freshener",
-      "Mosquito Repellent",
-      "Mosquito Coil",
-      "Insect Repellent",
-      "First Aid",
-      "Band Aid",
-      "Newspaper",
-      "Magazine",
-      "SIM Card",
-      "Recharge Voucher",
-      "Data Card",
-      "Umbrella",
-      "Raincoat",
-      "Torch",
-      "Candle",
-      "Match Stick",
-      "Matches",
-      "Lighter Gas",
-      "Incense Stick",
-      "Agarbatti",
-      "Room Spray",
-      "Perfume",
-      "Deodorant",
-      "Toothbrush",
-      "Comb",
-      "Shaving Kit",
-      "Razor",
-      "Shower Cap",
-      "Bathroom Slipper",
-      "Slipper",
-      "Hanger",
-      "Laundry Bag",
-      "Iron Charge",
-      "Wifi Charge",
-      "Internet Charge",
-      "Parking Charge",
-      "Valet Charge",
-      "Corkage Charge",
-      "Corkage Fee",
-      "Music License Fee",
-      "AC Charge",
-      "Generator Charge",
-      "Power Backup Charge",
-    ];
-
-    const NONFOOD_CONTEXT_EXCEPTIONS = [
-      ["water", "bottle"],
-      ["mineral water", "bottle"],
-      ["drinking water", "bottle"],
-      ["juice", "bottle"],
-      ["soft drink", "bottle"],
-      ["cold drink", "bottle"],
-      ["water", "glass"],
-      ["juice", "glass"],
-      ["water", "cup"],
-    ];
-
-    const dineInState = {
-      fileData: null, // { headers: [], rows: [[...]] }
-      headerIndex: {},
-      finalHeaders: null,
-      finalRows: null,
-      markedList: null, // [{name, keyword}]
-      totalCount: 0,
-      markedCount: 0,
-    };
-
-    const dineEl = {
-      card: document.getElementById("dineInCard"),
-      input: document.getElementById("dineInInput"),
-      filename: document.getElementById("dineInFilename"),
-      keywordsBox: document.getElementById("nonFoodKeywords"),
-      statTotal: document.getElementById("statDineInTotal"),
-      statMarked: document.getElementById("statDineInMarked"),
-      statKeywords: document.getElementById("statDineInKeywords"),
-      processBtn: document.getElementById("dineInProcessBtn"),
-      resetBtn: document.getElementById("dineInResetBtn"),
-      downloadBtn: document.getElementById("dineInDownloadBtn"),
-      progressSection: document.getElementById("dineInProgressSection"),
-      progressStatus: document.getElementById("dineInProgressStatus"),
-      progressFill: document.getElementById("dineInProgressFill"),
-      resultSection: document.getElementById("dineInResultSection"),
-      resTotal: document.getElementById("dineInResTotal"),
-      resMarked: document.getElementById("dineInResMarked"),
-      resTime: document.getElementById("dineInResTime"),
-      markedTableBody: document.getElementById("dineInMarkedTableBody"),
-    };
-
-    // Populate the keyword textarea with the default list on load
-    dineEl.keywordsBox.value = DEFAULT_NONFOOD_KEYWORDS.join("\n");
-    dineEl.statKeywords.textContent = DEFAULT_NONFOOD_KEYWORDS.length;
-    dineEl.keywordsBox.addEventListener("input", () => {
-      const lines = dineEl.keywordsBox.value
-        .split("\n")
-        .map((l) => l.trim())
-        .filter((l) => l !== "");
-      dineEl.statKeywords.textContent = lines.length;
-    });
-
-    function escapeRegExp(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    function isContextException(itemName, keyword) {
-      const item = normalizeName(itemName);
-      const kw = normalizeName(keyword);
-
-      return NONFOOD_CONTEXT_EXCEPTIONS.some(([context, target]) => {
-        return (
-          kw === target &&
-          item.includes(context)
-        );
-      });
-    }
-
-    function findNonFoodMatch(itemName, keywords) {
-      const normalized = normalizeName(itemName);
-      if (normalized === "") return null;
-
-      for (const kw of keywords) {
-        const normKw = normalizeName(kw);
-        if (normKw === "") continue;
-
-        // Context exception:
-        // Example: "Bottle" keyword should NOT mark "Water Bottle" as No.
-        if (isContextException(normalized, normKw)) {
-          continue;
-        }
-
-        const pattern = new RegExp(
-          "\\b" + escapeRegExp(normKw) + "\\b",
-          "i"
-        );
-
-        if (pattern.test(normalized)) {
-          return kw;
-        }
-      }
-
-      return null;
-    }
-
-    async function handleDineInFile(file) {
-      if (!file.name.toLowerCase().endsWith(".csv")) {
-        showToast("Please upload a valid .csv file", "error");
-        return;
-      }
-      try {
-        const text = await readFileAsText(file);
-        const parsed = removeColumnIfExists(parseCSV(text), "Markup Price");
-        if (!validateHeaders(parsed.headers, ["item name", "price"])) {
-          showToast("Invalid Dine-in CSV: missing Item Name or Price column", "error");
-          return;
-        }
-        dineInState.fileData = parsed;
-        dineInState.headerIndex = buildHeaderIndex(parsed.headers);
-        dineEl.filename.textContent = file.name;
-        dineEl.filename.style.display = "inline-block";
-        dineEl.card.classList.add("loaded");
-        dineEl.statTotal.textContent = parsed.rows.length;
-        showToast("Dine-in Menu Loaded", "success");
-        dineEl.processBtn.disabled = false;
-      } catch (err) {
-        showToast("Failed to read Dine-in CSV", "error");
-        console.error(err);
-      }
-    }
-
-    setupDropZone(dineEl.card, dineEl.input, handleDineInFile);
-
-    async function runDineInProcess() {
-      const startTime = performance.now();
-      dineEl.processBtn.disabled = true;
-      dineEl.downloadBtn.disabled = true;
-      dineEl.resultSection.classList.remove("active");
-
-      dineEl.progressSection.classList.add("active");
-      dineEl.progressFill.style.width = "0%";
-      dineEl.progressStatus.textContent = "Preparing...";
-      await sleep(120);
-
-      dineEl.progressFill.style.width = "20%";
-      dineEl.progressStatus.textContent = "Reading Dine-in Menu...";
-      const origHeaders = dineInState.fileData.headers;
-      const rows = dineInState.fileData.rows;
-      const idx = dineInState.headerIndex;
-      const nameIdx = idx["item name"];
-      const availIdx = idx["available"]; // may be undefined
-      const priceIdx = idx["price"];
-      const itemTypeIdx = idx["item type"]; // may be undefined
-      await sleep(150);
-
-      dineEl.progressFill.style.width = "40%";
-      dineEl.progressStatus.textContent = "Inserting Area Display Name Column...";
-      // Build final headers: insert "Area Display Name" right after "Online Display Name"
-      const onlineDisplayPos = origHeaders.findIndex((h) => normalizeName(h) === "online display name");
-      const finalHeaders = [...origHeaders];
-      let insertAt = onlineDisplayPos !== -1 ? onlineDisplayPos + 1 : finalHeaders.length;
-      finalHeaders.splice(insertAt, 0, "Area Display Name");
-      await sleep(150);
-
-      dineEl.progressFill.style.width = "60%";
-      dineEl.progressStatus.textContent = "Loading Keyword List...";
-      const keywords = dineEl.keywordsBox.value
-        .split("\n")
-        .map((l) => l.trim())
-        .filter((l) => l !== "");
-      await sleep(150);
-
-      dineEl.progressFill.style.width = "80%";
-      dineEl.progressStatus.textContent = "Flagging Non-Food & Zero-Price Items...";
-
-      // Pre-compute: for every "item" row, does it have "variation" rows directly below it,
-      // and are ALL of those variations zero-priced? The parent is only zero-price-flagged
-      // when every variation beneath it is 0; if even one variation has a real price, the
-      // parent stays untouched (Yes) and only the individual zero variations get marked No.
-      const hasVariationBelow = new Array(rows.length).fill(false);
-      const allVariationsZero = new Array(rows.length).fill(false);
-      if (itemTypeIdx !== undefined) {
-        for (let i = 0; i < rows.length; i++) {
-          const rowType = normalizeName(getCell(rows[i], itemTypeIdx));
-          if (rowType !== "item") continue;
-          let j = i + 1;
-          let found = false;
-          let allZero = true;
-          while (j < rows.length && normalizeName(getCell(rows[j], itemTypeIdx)) === "variation") {
-            found = true;
-            const p = parseFloat(getCell(rows[j], priceIdx));
-            const isZero = !isNaN(p) && p === 0;
-            if (!isZero) allZero = false;
-            j++;
+          while (rows.length && rows[rows.length - 1].every((c) => c === "")) {
+            rows.pop();
           }
-          hasVariationBelow[i] = found;
-          allVariationsZero[i] = found && allZero;
-        }
-      }
 
-      const marked = [];
-      const finalRows = new Array(rows.length);
-      for (let i = 0; i < rows.length; i++) {
-        const srcRow = rows[i];
-        const newRow = [...srcRow];
-        // pad row to original header length if short
-        while (newRow.length < origHeaders.length) newRow.push("");
-        // insert blank Area Display Name at the same position
-        newRow.splice(insertAt, 0, "");
+          if (!rows.length) return { headers: [], rows: [] };
 
-        const itemName = getCell(srcRow, nameIdx);
-        const matchedKeyword = findNonFoodMatch(itemName, keywords);
-
-        // Zero-price check: parent rows with variations only get flagged if ALL variations
-        // beneath them are zero; everything else (standalone items, variation rows, other
-        // types) is checked purely on its own price.
-        let zeroPriceHit = false;
-        let isGroupZero = false;
-        if (priceIdx !== undefined) {
-          const rowType = itemTypeIdx !== undefined ? normalizeName(getCell(srcRow, itemTypeIdx)) : "";
-          if (rowType === "item" && hasVariationBelow[i]) {
-            zeroPriceHit = allVariationsZero[i];
-            isGroupZero = zeroPriceHit;
-          } else {
-            const priceVal = parseFloat(getCell(srcRow, priceIdx));
-            zeroPriceHit = !isNaN(priceVal) && priceVal === 0;
-          }
+          return {
+            headers: rows[0].map((h) => h.trim()),
+            rows: rows.slice(1).filter((r) => !(r.length === 1 && r[0] === "")),
+          };
         }
 
-        const reason = matchedKeyword ? matchedKeyword : zeroPriceHit ? (isGroupZero ? "Zero Price (All Variations)" : "Zero Price") : null;
+        function escapeCSVField(value) {
+          if (value === undefined || value === null) value = "";
+          value = String(value);
+          return /[",\n\r]/.test(value)
+            ? '"' + value.replace(/"/g, '""') + '"'
+            : value;
+        }
 
-        if (reason) {
-          // Available column index shifts by +1 if it was after the insert point
-          let finalAvailIdx = availIdx;
-          if (finalAvailIdx !== undefined && finalAvailIdx >= insertAt) finalAvailIdx += 1;
-          if (finalAvailIdx !== undefined) {
-            newRow[finalAvailIdx] = "No";
+        function isContextException(itemName, keyword) {
+          const item = normalizeName(itemName);
+          const kw = normalizeName(keyword);
+
+          return NONFOOD_CONTEXT_EXCEPTIONS.some(
+            ([context, target]) => kw === target && item.includes(context),
+          );
+        }
+
+        function escapeRegExp(str) {
+          return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function findNonFoodMatch(itemName, keywords) {
+          const normalized = normalizeName(itemName);
+          if (!normalized) return null;
+
+          for (const kw of keywords) {
+            const normKw = normalizeName(kw);
+            if (!normKw) continue;
+
+            if (isContextException(normalized, normKw)) continue;
+
+            const pattern = new RegExp(
+              "\\b" + escapeRegExp(normKw) + "\\b",
+              "i",
+            );
+
+            if (pattern.test(normalized)) return kw;
           }
-          marked.push({
-            name: itemName,
-            keyword: reason,
-            rowIndex: i,
-            availIdx: finalAvailIdx,
+
+          return null;
+        }
+
+        function readFileAsText(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsText(file, "UTF-8");
           });
         }
-        finalRows[i] = newRow;
+
+        async function process(
+          file,
+          customKeywords,
+          onProgress,
+          dietaryOptions = {},
+        ) {
+          if (!file || !file.name.toLowerCase().endsWith(".csv")) {
+            throw new Error("Please upload a valid .csv file");
+          }
+
+          onProgress?.(10, "Reading Dine-in Menu...");
+          const text = await readFileAsText(file);
+
+          let parsed = removeColumnIfExists(parseCSV(text), "Markup Price");
+
+          const normalizedHeaders = parsed.headers.map(normalizeName);
+          if (
+            !normalizedHeaders.includes("item name") ||
+            !normalizedHeaders.includes("price")
+          ) {
+            throw new Error(
+              "Invalid Dine-in CSV: missing Item Name or Price column",
+            );
+          }
+
+          if (!parsed.headers.length) {
+            throw new Error("CSV has no headers");
+          }
+
+          onProgress?.(30, "Preparing columns...");
+
+          const origHeaders = parsed.headers;
+          const rows = parsed.rows;
+          const headerIndex = {};
+          origHeaders.forEach((h, i) => {
+            const key = normalizeName(h);
+            // Keep the first occurrence. Duplicate headers should not silently
+            // switch the processor to a later unrelated column.
+            if (headerIndex[key] === undefined) headerIndex[key] = i;
+          });
+
+          const nameIdx = headerIndex["item name"];
+          const availIdx = headerIndex["available"];
+          const priceCandidates = origHeaders
+            .map((h, i) => ({ h: normalizeName(h), i }))
+            .filter((x) => x.h === "price")
+            .map((x) => x.i);
+
+          if (!priceCandidates.length) {
+            throw new Error("Invalid Dine-in CSV: missing exact Price column");
+          }
+
+          // Select the actual Price column by numeric density. This is a guard
+          // against malformed/duplicate CSV headers and prevents Short Code or
+          // another numeric column from ever being used as the price source.
+          const priceIdx = priceCandidates
+            .map((idx) => {
+              const sample = rows.slice(0, 200);
+              const numeric = sample.reduce(
+                (count, row) =>
+                  count +
+                  (Number.isFinite(parsePriceValue(getCell(row, idx))) ? 1 : 0),
+                0,
+              );
+              return { idx, numeric };
+            })
+            .sort((a, b) => b.numeric - a.numeric)[0].idx;
+
+          const itemTypeIdx = headerIndex["item type"];
+
+          // Do not add Area Display Name when it is already present.
+          const existingAreaDisplayIdx = origHeaders.findIndex(
+            (h) => normalizeName(h) === "area display name",
+          );
+          const hasAreaDisplayName = existingAreaDisplayIdx !== -1;
+
+          const finalHeaders = [...origHeaders];
+          const onlineDisplayPos = origHeaders.findIndex(
+            (h) => normalizeName(h) === "online display name",
+          );
+          const insertAt = hasAreaDisplayName
+            ? -1
+            : onlineDisplayPos !== -1
+              ? onlineDisplayPos + 1
+              : finalHeaders.length;
+
+          if (!hasAreaDisplayName) {
+            finalHeaders.splice(insertAt, 0, "Area Display Name");
+          }
+
+          // Dietary is normally the column immediately after Description.
+          // Prefer an explicit Dietary header when present, otherwise use Description + 1.
+          const descriptionIdx = headerIndex["description"];
+          const explicitDietaryIdx = headerIndex["dietary"];
+          const dietaryIdx =
+            explicitDietaryIdx !== undefined
+              ? explicitDietaryIdx
+              : descriptionIdx !== undefined &&
+                  descriptionIdx + 1 < origHeaders.length
+                ? descriptionIdx + 1
+                : undefined;
+
+          const excludeNonVeg = Boolean(dietaryOptions.excludeNonVeg);
+          const excludeEgg = Boolean(dietaryOptions.excludeEgg);
+
+          function dietaryMatches(value) {
+            const normalized = normalizeName(value)
+              .replace(/[–—]/g, "-")
+              .replace(/_/g, " ");
+
+            if (!normalized) return [];
+
+            const matches = [];
+
+            // Match dietary tags, not the substring "veg", so normal Veg items are safe.
+            const nonVegPattern = /(^|[|,;/+\s])non[- ]?veg($|[|,;/+\s])/i;
+            const eggPattern = /(^|[|,;/+\s])egg(s)?($|[|,;/+\s])/i;
+
+            if (excludeNonVeg && nonVegPattern.test(normalized)) {
+              matches.push("Non-Veg");
+            }
+
+            if (excludeEgg && eggPattern.test(normalized)) {
+              matches.push("Egg");
+            }
+
+            return matches;
+          }
+
+          const keywords = (customKeywords || DEFAULT_NONFOOD_KEYWORDS)
+            .map((x) => String(x).trim())
+            .filter(Boolean);
+
+          onProgress?.(50, "Checking variations and zero prices...");
+
+          const hasVariationBelow = new Array(rows.length).fill(false);
+          const allVariationsZero = new Array(rows.length).fill(false);
+
+          if (itemTypeIdx !== undefined) {
+            for (let i = 0; i < rows.length; i++) {
+              const rowType = normalizeName(getCell(rows[i], itemTypeIdx));
+              if (rowType !== "item") continue;
+
+              let j = i + 1;
+              let found = false;
+              let allZero = true;
+
+              while (
+                j < rows.length &&
+                normalizeName(getCell(rows[j], itemTypeIdx)) === "variation"
+              ) {
+                found = true;
+                const p = parsePriceValue(getCell(rows[j], priceIdx));
+                const isZero = !isNaN(p) && p === 0;
+                if (!isZero) allZero = false;
+                j++;
+              }
+
+              hasVariationBelow[i] = found;
+              allVariationsZero[i] = found && allZero;
+            }
+          }
+
+          onProgress?.(70, "Flagging non-food and zero-price items...");
+
+          const marked = [];
+          const finalRows = new Array(rows.length);
+
+          for (let i = 0; i < rows.length; i++) {
+            const srcRow = rows[i];
+            const newRow = [...srcRow];
+
+            while (newRow.length < origHeaders.length) newRow.push("");
+
+            if (!hasAreaDisplayName) {
+              newRow.splice(insertAt, 0, "");
+            }
+
+            const itemName = getCell(srcRow, nameIdx);
+            const matchedKeyword = findNonFoodMatch(itemName, keywords);
+            const dietaryHits = dietaryMatches(
+              dietaryIdx !== undefined ? getCell(srcRow, dietaryIdx) : "",
+            );
+
+            let zeroPriceHit = false;
+            let isGroupZero = false;
+
+            if (priceIdx !== undefined) {
+              const rowType =
+                itemTypeIdx !== undefined
+                  ? normalizeName(getCell(srcRow, itemTypeIdx))
+                  : "";
+              const priceVal = parsePriceValue(getCell(srcRow, priceIdx));
+
+              if (rowType === "item" && hasVariationBelow[i]) {
+                zeroPriceHit = allVariationsZero[i];
+                isGroupZero = zeroPriceHit;
+              } else {
+                zeroPriceHit = !isNaN(priceVal) && priceVal === 0;
+              }
+            }
+
+            const reason = matchedKeyword
+              ? matchedKeyword
+              : dietaryHits.length
+                ? `Dietary: ${dietaryHits.join(" + ")}`
+                : zeroPriceHit
+                  ? isGroupZero
+                    ? "Zero Price (All Variations)"
+                    : "Zero Price"
+                  : null;
+
+            if (reason) {
+              let finalAvailIdx = availIdx;
+
+              if (finalAvailIdx !== undefined && finalAvailIdx >= insertAt) {
+                finalAvailIdx += 1;
+              }
+
+              if (finalAvailIdx !== undefined) {
+                newRow[finalAvailIdx] = "No";
+              }
+
+              marked.push({
+                name: itemName,
+                reason,
+                rowIndex: i,
+                availIdx: finalAvailIdx,
+              });
+            }
+
+            finalRows[i] = newRow;
+          }
+
+          onProgress?.(100, "Completed");
+
+          return {
+            finalHeaders,
+            finalRows,
+            marked,
+            totalCount: rows.length,
+            markedCount: marked.length,
+          };
+        }
+
+        function generateCSV(result) {
+          const lines = [result.finalHeaders.map(escapeCSVField).join(",")];
+
+          for (const row of result.finalRows) {
+            lines.push(row.map(escapeCSVField).join(","));
+          }
+
+          return lines.join("\r\n");
+        }
+
+        window.DineInProcessor = {
+          DEFAULT_NONFOOD_KEYWORDS,
+          process,
+          generateCSV,
+        };
+      })();
+    </script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const fileEl = $("file"),
+        upload = $("upload"),
+        filename = $("filename"),
+        keywords = $("keywords"),
+        processBtn = $("process"),
+        downloadBtn = $("download"),
+        resetBtn = $("reset"),
+        progress = $("progress"),
+        fill = $("fill"),
+        progressText = $("progressText"),
+        result = $("result"),
+        total = $("total"),
+        marked = $("marked"),
+        reviewBody = $("reviewBody"),
+        reviewCount = $("reviewCount"),
+        reasonFilter = $("reasonFilter"),
+        selectAll = $("selectAll");
+      let selectedFile = null,
+        processed = null;
+      keywords.value =
+        window.DineInProcessor.DEFAULT_NONFOOD_KEYWORDS.join("\n");
+      function toast(msg, type = "ok") {
+        const d = document.createElement("div");
+        d.className = "toast " + type;
+        d.textContent = (type === "ok" ? "✅ " : "❌ ") + msg;
+        $("toast").appendChild(d);
+        setTimeout(() => d.remove(), 3200);
       }
-      await sleep(150);
-
-      dineEl.progressFill.style.width = "100%";
-      dineEl.progressStatus.textContent = "Completed";
-      await sleep(250);
-      dineEl.progressSection.classList.remove("active");
-
-      dineInState.finalHeaders = finalHeaders;
-      dineInState.finalRows = finalRows;
-      dineInState.markedList = marked;
-      dineInState.totalCount = rows.length;
-      dineInState.markedCount = marked.length;
-
-      const elapsed = Math.round(performance.now() - startTime);
-      displayDineInResults(elapsed);
-
-      dineEl.statTotal.textContent = dineInState.totalCount;
-      dineEl.statMarked.textContent = dineInState.markedCount;
-      dineEl.downloadBtn.disabled = false;
-      dineEl.processBtn.disabled = false;
-
-      showToast("Dine-in Menu Processed", "success");
-    }
-
-    function displayDineInResults(elapsedMs) {
-      dineEl.resultSection.classList.add("active");
-      dineEl.resTotal.textContent = dineInState.totalCount;
-      dineEl.resMarked.textContent = dineInState.markedCount;
-      dineEl.resTime.textContent = elapsedMs + "ms";
-
-      dineEl.markedTableBody.innerHTML = "";
-      if (dineInState.markedList.length === 0) {
-        dineEl.markedTableBody.innerHTML = `<tr><td colspan="4" class="empty-state">No non-food items detected with the current keyword list.</td></tr>`;
-      } else {
-        const frag = document.createDocumentFragment();
-        dineInState.markedList.forEach((item, i) => {
-          const tr = document.createElement("tr");
-          const disabled = item.availIdx === undefined ? "disabled" : "";
-          tr.innerHTML = `<td>${i + 1}</td><td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.keyword)}</td>
-        <td><label class="mark-yes-label">
-          <input type="checkbox" class="markYesCheckbox" data-marked-idx="${i}" ${disabled}> Mark Yes
-        </label></td>`;
-          frag.appendChild(tr);
-        });
-        dineEl.markedTableBody.appendChild(frag);
+      function setProgress(p, t) {
+        fill.style.width = p + "%";
+        progressText.textContent = t;
       }
-    }
-
-    // Toggle a single marked item's Available value between "No" (default) and "Yes" (manual override)
-    function toggleDineInAvailability(markedIdx, markAsYes) {
-      const item = dineInState.markedList[markedIdx];
-      if (!item || item.availIdx === undefined) return;
-      const row = dineInState.finalRows[item.rowIndex];
-      row[item.availIdx] = markAsYes ? "Yes" : "No";
-    }
-
-    // Delegated change listener for all "Mark Yes" checkboxes in the marked-items table
-    dineEl.markedTableBody.addEventListener("change", (e) => {
-      if (!e.target.classList.contains("markYesCheckbox")) return;
-      const idx = parseInt(e.target.getAttribute("data-marked-idx"), 10);
-      toggleDineInAvailability(idx, e.target.checked);
-    });
-
-    document.getElementById("selectAllYesCheckbox").addEventListener("change", (e) => {
-      const checked = e.target.checked;
-      document.querySelectorAll(".markYesCheckbox").forEach((cb) => {
-        if (cb.disabled) return;
-        cb.checked = checked;
-        const idx = parseInt(cb.getAttribute("data-marked-idx"), 10);
-        toggleDineInAvailability(idx, checked);
-      });
-    });
-
-    function generateDineInCSV() {
-      const lines = [dineInState.finalHeaders.map(escapeCSVField).join(",")];
-      for (const row of dineInState.finalRows) lines.push(row.map(escapeCSVField).join(","));
-      return lines.join("\r\n");
-    }
-
-    dineEl.processBtn.addEventListener("click", () => {
-      if (!dineInState.fileData) {
-        showToast("Please upload the Dine-in Menu CSV first", "error");
-        return;
-      }
-      runDineInProcess();
-    });
-
-    dineEl.downloadBtn.addEventListener("click", () => {
-      if (!dineInState.finalRows) return;
-      downloadTextAsFile(generateDineInCSV(), "dinein_menu_processed.csv");
-      showToast("Download Ready", "success");
-    });
-
-    dineEl.resetBtn.addEventListener("click", () => {
-      dineInState.fileData = null;
-      dineInState.headerIndex = {};
-      dineInState.finalHeaders = null;
-      dineInState.finalRows = null;
-      dineInState.markedList = null;
-      dineInState.totalCount = 0;
-      dineInState.markedCount = 0;
-
-      dineEl.input.value = "";
-      dineEl.filename.textContent = "";
-      dineEl.filename.style.display = "none";
-      dineEl.card.classList.remove("loaded");
-      dineEl.processBtn.disabled = true;
-      dineEl.downloadBtn.disabled = true;
-      dineEl.progressSection.classList.remove("active");
-      dineEl.resultSection.classList.remove("active");
-      dineEl.markedTableBody.innerHTML = "";
-      document.getElementById("selectAllYesCheckbox").checked = false;
-      dineEl.statTotal.textContent = "0";
-      dineEl.statMarked.textContent = "0";
-      dineEl.keywordsBox.value = DEFAULT_NONFOOD_KEYWORDS.join("\n");
-      dineEl.statKeywords.textContent = DEFAULT_NONFOOD_KEYWORDS.length;
-
-      showToast("Dine-in processor reset", "info");
-    });
-
-    /* ======================================================================
- ITEM AREA-WISE PRICE SHEET — independent tool (no online file needed)
- Copies Easy Cater's Price from a chosen AC/Dine-in price column, and
- Easy Cater's Available from the column immediately after a chosen
- Zomato/Swiggy column, for every row top to bottom.
-====================================================================== */
-    const areaSheetState = {
-      fileData: null, // { headers: [], rows: [[...]] }
-      finalRows: null,
-      totalCount: 0,
-      updatedCount: 0,
-    };
-
-    const areaEl = {
-      card: document.getElementById("areaSheetCard"),
-      input: document.getElementById("areaSheetInput"),
-      filename: document.getElementById("areaSheetFilename"),
-      pickerSection: document.getElementById("areaSheetPickerSection"),
-      acSelect: document.getElementById("acColumnSelect"),
-      zomatoSelect: document.getElementById("zomatoColumnSelect"),
-      easyCaterSelect: document.getElementById("easyCaterColumnSelect"),
-      statTotal: document.getElementById("statAreaSheetTotal"),
-      statUpdated: document.getElementById("statAreaSheetUpdated"),
-      processBtn: document.getElementById("areaSheetProcessBtn"),
-      resetBtn: document.getElementById("areaSheetResetBtn"),
-      downloadBtn: document.getElementById("areaSheetDownloadBtn"),
-      progressSection: document.getElementById("areaSheetProgressSection"),
-      progressStatus: document.getElementById("areaSheetProgressStatus"),
-      progressFill: document.getElementById("areaSheetProgressFill"),
-      resultSection: document.getElementById("areaSheetResultSection"),
-      resTotal: document.getElementById("areaSheetResTotal"),
-      resTime: document.getElementById("areaSheetResTime"),
-      previewTableBody: document.getElementById("areaSheetPreviewTableBody"),
-    };
-
-    async function handleAreaSheetFile(file) {
-      if (!file.name.toLowerCase().endsWith(".csv")) {
-        showToast("Please upload a valid .csv file", "error");
-        return;
-      }
-      try {
-        const text = await readFileAsText(file);
-        const parsed = removeColumnIfExists(parseCSV(text), "Markup Price");
-        if (parsed.headers.length === 0 || parsed.rows.length === 0) {
-          showToast("Invalid CSV: no headers or rows found", "error");
+      function loadFile(f) {
+        if (!f || !f.name.toLowerCase().endsWith(".csv")) {
+          toast("Please select a valid .csv file", "err");
           return;
         }
-        areaSheetState.fileData = parsed;
-        areaEl.filename.textContent = file.name;
-        areaEl.filename.style.display = "inline-block";
-        areaEl.card.classList.add("loaded");
-        areaEl.statTotal.textContent = parsed.rows.length;
-        populateAreaSheetColumnPickers(parsed.headers);
-        areaEl.pickerSection.style.display = "block";
-        showToast("Area-wise Price Sheet Loaded", "success");
-        areaEl.processBtn.disabled = false;
-      } catch (err) {
-        showToast("Failed to read CSV", "error");
-        console.error(err);
+        selectedFile = f;
+        filename.textContent = f.name;
+        filename.style.display = "block";
+        upload.classList.add("loaded");
+        processBtn.disabled = false;
+        toast("Dine-in Menu Loaded");
       }
-    }
-
-    function populateAreaSheetColumnPickers(headers) {
-      const optionsHtml = headers.map((h, i) => `<option value="${i}">${i + 1}: ${escapeHtml(h || "(unnamed)")}</option>`).join("");
-      areaEl.acSelect.innerHTML = optionsHtml;
-      areaEl.zomatoSelect.innerHTML = optionsHtml;
-      areaEl.easyCaterSelect.innerHTML = optionsHtml;
-
-      // best-effort auto-guess based on header text, user can still override
-      const guess = (needle) => headers.findIndex((h) => normalizeName(h).includes(needle));
-      const acGuess = guess("ac");
-      const zomatoGuess = guess("zomato") !== -1 ? guess("zomato") : guess("swiggy");
-      const easyCaterGuess = guess("easy cater");
-
-      if (acGuess !== -1) areaEl.acSelect.value = acGuess;
-      if (zomatoGuess !== -1) areaEl.zomatoSelect.value = zomatoGuess;
-      if (easyCaterGuess !== -1) areaEl.easyCaterSelect.value = easyCaterGuess;
-    }
-
-    setupDropZone(areaEl.card, areaEl.input, handleAreaSheetFile);
-
-    async function runAreaSheetProcess() {
-      const startTime = performance.now();
-      areaEl.processBtn.disabled = true;
-      areaEl.downloadBtn.disabled = true;
-      areaEl.resultSection.classList.remove("active");
-
-      const headers = areaSheetState.fileData.headers;
-      const rows = areaSheetState.fileData.rows;
-      const acIdx = parseInt(areaEl.acSelect.value, 10);
-      const zomatoIdx = parseInt(areaEl.zomatoSelect.value, 10);
-      const easyCaterIdx = parseInt(areaEl.easyCaterSelect.value, 10);
-      const zomatoAvailIdx = zomatoIdx + 1;
-      const easyCaterAvailIdx = easyCaterIdx + 1;
-
-      if (zomatoAvailIdx >= headers.length) {
-        showToast("Zomato/Swiggy column has no column after it for Available — pick a different column", "error");
-        areaEl.processBtn.disabled = false;
-        return;
+      upload.addEventListener("click", () => fileEl.click());
+      fileEl.addEventListener("change", (e) => loadFile(e.target.files[0]));
+      ["dragenter", "dragover"].forEach((e) =>
+        upload.addEventListener(e, (x) => {
+          x.preventDefault();
+          upload.classList.add("drag");
+        }),
+      );
+      ["dragleave", "drop"].forEach((e) =>
+        upload.addEventListener(e, (x) => {
+          x.preventDefault();
+          upload.classList.remove("drag");
+        }),
+      );
+      upload.addEventListener("drop", (e) => loadFile(e.dataTransfer.files[0]));
+      function reasonType(r) {
+        const x = String(r || "").toLowerCase();
+        if (x.startsWith("dietary:")) return "dietary";
+        if (x.includes("zero price (all variations)")) return "zero-variation";
+        if (x.includes("zero price")) return "zero";
+        return "nonfood";
       }
-      if (easyCaterAvailIdx >= headers.length) {
-        showToast("Easy Cater column has no column after it for Available — pick a different column", "error");
-        areaEl.processBtn.disabled = false;
-        return;
-      }
-
-      areaEl.progressSection.classList.add("active");
-      areaEl.progressFill.style.width = "0%";
-      areaEl.progressStatus.textContent = "Preparing...";
-      await sleep(120);
-
-      areaEl.progressFill.style.width = "35%";
-      areaEl.progressStatus.textContent = "Reading Sheet...";
-      await sleep(150);
-
-      areaEl.progressFill.style.width = "65%";
-      areaEl.progressStatus.textContent = "Syncing Easy Cater Columns...";
-      const finalRows = new Array(rows.length);
-      for (let i = 0; i < rows.length; i++) {
-        const srcRow = rows[i];
-        const newRow = [...srcRow];
-        while (newRow.length < headers.length) newRow.push("");
-        newRow[easyCaterIdx] = getCell(srcRow, acIdx);
-        newRow[easyCaterAvailIdx] = getCell(srcRow, zomatoAvailIdx);
-        finalRows[i] = newRow;
-      }
-      await sleep(150);
-
-      areaEl.progressFill.style.width = "100%";
-      areaEl.progressStatus.textContent = "Completed";
-      await sleep(250);
-      areaEl.progressSection.classList.remove("active");
-
-      areaSheetState.finalRows = finalRows;
-      areaSheetState.totalCount = rows.length;
-      areaSheetState.updatedCount = rows.length;
-
-      const elapsed = Math.round(performance.now() - startTime);
-      displayAreaSheetResults(elapsed, easyCaterIdx, easyCaterAvailIdx);
-
-      areaEl.statTotal.textContent = areaSheetState.totalCount;
-      areaEl.statUpdated.textContent = areaSheetState.updatedCount;
-      areaEl.downloadBtn.disabled = false;
-      areaEl.processBtn.disabled = false;
-
-      showToast("Easy Cater Columns Synced", "success");
-    }
-
-    function displayAreaSheetResults(elapsedMs, easyCaterIdx, easyCaterAvailIdx) {
-      areaEl.resultSection.classList.add("active");
-      areaEl.resTotal.textContent = areaSheetState.totalCount;
-      areaEl.resTime.textContent = elapsedMs + "ms";
-
-      areaEl.previewTableBody.innerHTML = "";
-      const preview = areaSheetState.finalRows.slice(0, 10);
-      if (preview.length === 0) {
-        areaEl.previewTableBody.innerHTML = `<tr><td colspan="4" class="empty-state">No rows to preview.</td></tr>`;
-      } else {
+      function renderReview() {
+        if (!processed) return;
+        const filter = reasonFilter.value;
+        const list = processed.marked.filter(
+          (x) => filter === "all" || reasonType(x.reason) === filter,
+        );
+        reviewBody.innerHTML = "";
+        reviewCount.textContent = `${processed.marked.length} items marked No • showing ${list.length}`;
+        if (!list.length) {
+          reviewBody.innerHTML =
+            '<tr><td colspan="4" class="empty">🎉 No matching items to review.</td></tr>';
+          return;
+        }
         const frag = document.createDocumentFragment();
-        preview.forEach((row, i) => {
+        list.forEach((item, i) => {
           const tr = document.createElement("tr");
-          const label = row[0] !== undefined && row[0] !== "" ? row[0] : `Row ${i + 1}`;
-          tr.innerHTML = `<td>${i + 1}</td><td>${escapeHtml(label)}</td><td>${escapeHtml(getCell(row, easyCaterIdx))}</td><td>${escapeHtml(getCell(row, easyCaterAvailIdx))}</td>`;
+          const checked =
+            processed.finalRows[item.rowIndex][item.availIdx] !== "No";
+          tr.innerHTML = `<td>${i + 1}</td><td><b>${escapeHtml(item.name)}</b></td><td><span class="reason">${escapeHtml(item.reason)}</span></td><td><label class="option"><input type="checkbox" class="override" data-row="${item.rowIndex}" data-idx="${item.availIdx}" ${checked ? "checked" : ""}> Mark Yes</label></td>`;
           frag.appendChild(tr);
         });
-        areaEl.previewTableBody.appendChild(frag);
+        reviewBody.appendChild(frag);
       }
-    }
-
-    function generateAreaSheetCSV() {
-      const headers = areaSheetState.fileData.headers;
-      const lines = [headers.map(escapeCSVField).join(",")];
-      for (const row of areaSheetState.finalRows) lines.push(row.map(escapeCSVField).join(","));
-      return lines.join("\r\n");
-    }
-
-    areaEl.processBtn.addEventListener("click", () => {
-      if (!areaSheetState.fileData) {
-        showToast("Please upload the Area-wise Price Sheet CSV first", "error");
-        return;
+      function escapeHtml(v) {
+        const d = document.createElement("div");
+        d.textContent = v ?? "";
+        return d.innerHTML;
       }
-      runAreaSheetProcess();
-    });
-
-    areaEl.downloadBtn.addEventListener("click", () => {
-      if (!areaSheetState.finalRows) return;
-      downloadTextAsFile(generateAreaSheetCSV(), "area_wise_price_sheet_synced.csv");
-      showToast("Download Ready", "success");
-    });
-
-    areaEl.resetBtn.addEventListener("click", () => {
-      areaSheetState.fileData = null;
-      areaSheetState.finalRows = null;
-      areaSheetState.totalCount = 0;
-      areaSheetState.updatedCount = 0;
-
-      areaEl.input.value = "";
-      areaEl.filename.textContent = "";
-      areaEl.filename.style.display = "none";
-      areaEl.card.classList.remove("loaded");
-      areaEl.pickerSection.style.display = "none";
-      areaEl.acSelect.innerHTML = "";
-      areaEl.zomatoSelect.innerHTML = "";
-      areaEl.easyCaterSelect.innerHTML = "";
-      areaEl.processBtn.disabled = true;
-      areaEl.downloadBtn.disabled = true;
-      areaEl.progressSection.classList.remove("active");
-      areaEl.resultSection.classList.remove("active");
-      areaEl.previewTableBody.innerHTML = "";
-      areaEl.statTotal.textContent = "0";
-      areaEl.statUpdated.textContent = "0";
-
-      showToast("Area-wise Price Sheet reset", "info");
-    });
-
-    /* ======================================================================
- PAGE SWITCHING (single-file, three "pages" toggled via display)
-====================================================================== */
-    const pageMerge = document.getElementById("page-merge");
-    const pageDineIn = document.getElementById("page-dinein");
-    const pageAreaSheet = document.getElementById("page-areasheet");
-    const openDineInBtn = document.getElementById("openDineInBtn");
-    const openAreaSheetBtn = document.getElementById("openAreaSheetBtn");
-    const backToMergeBtn = document.getElementById("backToMergeBtn");
-    const backToMergeBtn2 = document.getElementById("backToMergeBtn2");
-
-    function goToPage(pageEl) {
-      pageMerge.classList.remove("active");
-      pageDineIn.classList.remove("active");
-      pageAreaSheet.classList.remove("active");
-      pageEl.classList.add("active");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    openDineInBtn.addEventListener("click", () => goToPage(pageDineIn));
-    openAreaSheetBtn.addEventListener("click", () => goToPage(pageAreaSheet));
-    backToMergeBtn.addEventListener("click", () => goToPage(pageMerge));
-    backToMergeBtn2.addEventListener("click", () => goToPage(pageMerge));
-
-    /* ======================================================================
- INIT
-====================================================================== */
-    updateStats();
-  </script>
-</body>
-
+      reviewBody.addEventListener("change", (e) => {
+        if (!e.target.classList.contains("override")) return;
+        const r = +e.target.dataset.row,
+          i = +e.target.dataset.idx;
+        if (processed?.finalRows[r] && i >= 0)
+          processed.finalRows[r][i] = e.target.checked ? "Yes" : "No";
+      });
+      reasonFilter.addEventListener("change", renderReview);
+      selectAll.addEventListener("click", () => {
+        if (!processed) return;
+        const filter = reasonFilter.value;
+        processed.marked
+          .filter((x) => filter === "all" || reasonType(x.reason) === filter)
+          .forEach((x) => {
+            if (x.availIdx !== undefined)
+              processed.finalRows[x.rowIndex][x.availIdx] = "Yes";
+          });
+        renderReview();
+      });
+      processBtn.addEventListener("click", async () => {
+        if (!selectedFile) return;
+        processBtn.disabled = true;
+        downloadBtn.disabled = true;
+        result.classList.remove("show");
+        progress.classList.add("show");
+        try {
+          const custom = keywords.value
+            .split("\n")
+            .map((x) => x.trim())
+            .filter(Boolean);
+          processed = await window.DineInProcessor.process(
+            selectedFile,
+            custom,
+            (p, t) => setProgress(p, t),
+            {
+              excludeNonVeg: $("nonveg").checked,
+              excludeEgg: $("egg").checked,
+            },
+          );
+          total.textContent = processed.totalCount;
+          marked.textContent = processed.markedCount;
+          renderReview();
+          result.classList.add("show");
+          downloadBtn.disabled = false;
+          setProgress(100, "Completed");
+          toast("Dine-in Menu Processed");
+        } catch (e) {
+          processed = null;
+          toast(e.message || "Processing failed", "err");
+        } finally {
+          setTimeout(() => progress.classList.remove("show"), 500);
+          processBtn.disabled = false;
+        }
+      });
+      downloadBtn.addEventListener("click", () => {
+        if (!processed) return;
+        const csv = window.DineInProcessor.generateCSV(processed);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "dinein_menu_processed.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast("Processed CSV downloaded");
+      });
+      resetBtn.addEventListener("click", () => {
+        selectedFile = null;
+        processed = null;
+        fileEl.value = "";
+        filename.textContent = "";
+        filename.style.display = "none";
+        upload.classList.remove("loaded");
+        processBtn.disabled = true;
+        downloadBtn.disabled = true;
+        result.classList.remove("show");
+        progress.classList.remove("show");
+        fill.style.width = "0";
+        total.textContent = "0";
+        marked.textContent = "0";
+        reviewBody.innerHTML = "";
+        reasonFilter.value = "all";
+        keywords.value =
+          window.DineInProcessor.DEFAULT_NONFOOD_KEYWORDS.join("\n");
+        $("nonveg").checked = false;
+        $("egg").checked = false;
+        toast("Processor reset");
+      });
+    </script>
+  </body>
 </html>
